@@ -18,6 +18,7 @@
 # include <unistd.h>
 # include <stdlib.h>
 # include <readline/readline.h>
+# include <sys/wait.h>
 # include <limits.h>
 
 void	wrong_path(void);

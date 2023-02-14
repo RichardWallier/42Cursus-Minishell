@@ -36,7 +36,7 @@ $(LIBFT):
 	@$(MAKE) $(LIBFTPATH)
 
 $(NAME):	$(SOURCE) $(LIBFT)
-	@$(CC) $(CFLAGS) $(LIBFILES) $(SOURCE) $(LIBFT) -o $(NAME)
+	@$(CC) $(CFLAGS) $(SOURCE) $(LIBFT) -o $(NAME) $(LIBFILES) 
 	@echo 'Minishell compiled'
 
 
