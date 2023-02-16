@@ -12,13 +12,11 @@
 
 #include "minishell.h"
 
-static char	**get_arguments(char *argv)
+static char	**get_arguments(char **args)
 {
-	char	**args;
 	char	**trimmed;
 	int		index;
 
-	args = ft_split2(argv, ' ');
 	index = 0;
 	while (args[index])
 		index++;
@@ -64,7 +62,7 @@ static char	*find_path(char *command, char **env)
 	return ((char *)wrong_path);
 }
 
-int	run_commands(char *cmds, char **env)
+int	run_commands(char **cmds, char **env)
 {
 	char	*path;
 	char	**arguments;
