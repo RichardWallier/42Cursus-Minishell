@@ -6,7 +6,7 @@
 /*   By: rwallier <rwallier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 18:52:01 by rwallier          #+#    #+#             */
-/*   Updated: 2023/02/16 19:54:19 by rwallier         ###   ########.fr       */
+/*   Updated: 2023/02/21 15:20:15 by rwallier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,8 +19,7 @@ int	main(void)
 	char		*temp;
 	extern char	**environ;
 
-	data.pwd = malloc(PATH_MAX);
-	getcwd(data.pwd, PATH_MAX);
+	data.pwd = getcwd(NULL, 0);
 	while (42)
 	{
 		data.bash = ft_strjoin(data.pwd, "$ ");
