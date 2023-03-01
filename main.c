@@ -6,7 +6,7 @@
 /*   By: rwallier <rwallier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 18:52:01 by rwallier          #+#    #+#             */
-/*   Updated: 2023/02/21 15:20:15 by rwallier         ###   ########.fr       */
+/*   Updated: 2023/03/01 20:40:32 by rwallier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,9 @@ int	main(void)
 	extern char	**environ;
 
 	data.pwd = getcwd(NULL, 0);
+	data.environ = environ;
+	for (int i = 0; environ[i] != NULL; i++)
+		printf("environ[%i]: %s\n", i, data.environ[i]);
 	while (42)
 	{
 		data.bash = ft_strjoin(data.pwd, "$ ");

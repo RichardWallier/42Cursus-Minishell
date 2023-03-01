@@ -39,7 +39,6 @@ $(NAME):	$(SOURCE) $(LIBFT)
 	@$(CC) $(CFLAGS) $(SOURCE) $(LIBFT) -o $(NAME) $(LIBFILES) 
 	@echo 'Minishell compiled'
 
-
 clean:
 	@$(RM) $(OBJECTS)
 	@$(MAKE) $(LIBFTPATH) clean

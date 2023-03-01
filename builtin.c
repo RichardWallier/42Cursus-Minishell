@@ -6,7 +6,7 @@
 /*   By: rwallier <rwallier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/16 18:29:46 by rwallier          #+#    #+#             */
-/*   Updated: 2023/02/21 15:20:46 by rwallier         ###   ########.fr       */
+/*   Updated: 2023/03/01 20:52:24 by rwallier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,12 +15,18 @@
 
 int	cd(char **cmd, t_data *data)
 {
-	if (matriz_len(cmd) > 2)
+	int	index;
+
+	index = -1;
+	if (matriz_len(cmd) == 1)
 	{
-		printf("cd: too many arguments\n");
-		return (-1);
+		while (data->environ[++index])
+			if (ft_strncmp("HOME=", data->environ[index], 5) == 0)
+				break;
+		chdir(data->environ[index] + 5);
 	}
-	chdir(cmd[1]);
+	else
+		chdir(cmd[1]);
 	free(data->pwd);
 	data->pwd = getcwd(NULL, 0);
 	return (1);
