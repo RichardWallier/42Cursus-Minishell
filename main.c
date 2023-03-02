@@ -6,7 +6,7 @@
 /*   By: rwallier <rwallier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 18:52:01 by rwallier          #+#    #+#             */
-/*   Updated: 2023/03/01 20:40:32 by rwallier         ###   ########.fr       */
+/*   Updated: 2023/03/01 21:23:38 by rwallier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,8 +21,6 @@ int	main(void)
 
 	data.pwd = getcwd(NULL, 0);
 	data.environ = environ;
-	for (int i = 0; environ[i] != NULL; i++)
-		printf("environ[%i]: %s\n", i, data.environ[i]);
 	while (42)
 	{
 		data.bash = ft_strjoin(data.pwd, "$ ");
@@ -31,6 +29,8 @@ int	main(void)
 		free(data.bash);
 		if (ft_strncmp(*data.prompt, "cd", ft_strlen(*data.prompt)) == 0)
 			cd(data.prompt, &data);
+		else if (ft_strncmp(*data.prompt, "env", ft_strlen(*data.prompt)) == 0)
+			env(&data);
 		else
 		{
 			pid = fork();

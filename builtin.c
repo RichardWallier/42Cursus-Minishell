@@ -6,7 +6,7 @@
 /*   By: rwallier <rwallier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/16 18:29:46 by rwallier          #+#    #+#             */
-/*   Updated: 2023/03/01 20:52:24 by rwallier         ###   ########.fr       */
+/*   Updated: 2023/03/01 21:21:06 by rwallier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,5 +29,15 @@ int	cd(char **cmd, t_data *data)
 		chdir(cmd[1]);
 	free(data->pwd);
 	data->pwd = getcwd(NULL, 0);
+	return (1);
+}
+
+int	env(t_data *data)
+{
+	int	index;
+
+	index = -1;
+	while (data->environ[++index])
+		printf("%s\n", data->environ[index]);
 	return (1);
 }
