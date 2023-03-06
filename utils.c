@@ -6,7 +6,7 @@
 /*   By: rwallier <rwallier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/16 18:49:12 by rwallier          #+#    #+#             */
-/*   Updated: 2023/02/16 19:50:19 by rwallier         ###   ########.fr       */
+/*   Updated: 2023/03/05 23:28:35 by rwallier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,4 +64,15 @@ char	*ft_strjoin_free(char *s1, char const *s2)
 	ft_strlcpy(&newstr[ft_strlen(s1)], s2, ft_strlen(s2) + 1);
 	free(s1);
 	return (newstr);
+}
+
+int	free_split(char **split)
+{
+	int	index;
+
+	index = 0;
+	while (split[index])
+		free(split[index++]);
+	free(split);
+	return (1);
 }

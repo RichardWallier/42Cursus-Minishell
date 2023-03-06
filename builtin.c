@@ -6,7 +6,7 @@
 /*   By: rwallier <rwallier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/16 18:29:46 by rwallier          #+#    #+#             */
-/*   Updated: 2023/03/05 23:14:31 by rwallier         ###   ########.fr       */
+/*   Updated: 2023/03/05 23:29:26 by rwallier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,6 +58,12 @@ int	unset_builtin(char **cmd, t_data *data)
 
 int	exit_builtin(t_data *data)
 {
+	int	index;
+
+	index = 0;
+	free_split(data->prompt);
+	free(data->pwd);
+	ft_lstclear(&data->environ, &free);
 	exit(EXIT_SUCCESS);
 	return (1);
 }

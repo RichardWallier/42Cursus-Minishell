@@ -6,7 +6,7 @@
 /*   By: rwallier <rwallier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 18:52:01 by rwallier          #+#    #+#             */
-/*   Updated: 2023/03/05 23:14:59 by rwallier         ###   ########.fr       */
+/*   Updated: 2023/03/05 23:29:12 by rwallier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,8 +26,9 @@ int	main(void)
 	{
 		data.bash = ft_strjoin(data.pwd, "$ ");
 		temp = readline(data.bash);
-		data.prompt = ft_split2(temp, ' ');
 		free(data.bash);
+		data.prompt = ft_split2(temp, ' ');
+		free(temp);
 		if (ft_strncmp(*data.prompt, "cd", ft_strlen(*data.prompt)) == 0)
 			cd_builtin(data.prompt, &data);
 		else if (ft_strncmp(*data.prompt, "env", ft_strlen(*data.prompt)) == 0)
@@ -45,6 +46,7 @@ int	main(void)
 				run_commands(data.prompt, environ);
 		}
 		waitpid(pid, NULL, 0);
+		free_split(data.prompt);
 	}
 	return (0);
 }

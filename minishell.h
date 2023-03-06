@@ -6,7 +6,7 @@
 /*   By: rwallier <rwallier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 18:52:16 by rwallier          #+#    #+#             */
-/*   Updated: 2023/03/05 23:14:42 by rwallier         ###   ########.fr       */
+/*   Updated: 2023/03/05 23:29:00 by rwallier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,8 @@ char	*ft_substr_free(char *str, unsigned int start, size_t len);
 
 char	*ft_strjoin_free(char *s1, char const *s2);
 
+int	free_split(char **split);
+
 int		parse_env(t_data *data, char **environ);
 
 // Built in commands
@@ -51,6 +53,6 @@ int		export_builtin(char **cmd, t_data *data);
 
 int		unset_builtin(char **cmd, t_data *data);
 
-int	exit_builtin(t_data *data);
+int		exit_builtin(t_data *data);
 
 #endif // !MINISHELL_H
