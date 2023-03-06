@@ -6,24 +6,21 @@
 /*   By: rwallier <rwallier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/16 18:29:46 by rwallier          #+#    #+#             */
-/*   Updated: 2023/03/01 21:21:06 by rwallier         ###   ########.fr       */
+/*   Updated: 2023/03/05 23:02:16 by rwallier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft/libft.h"
 #include "minishell.h"
 
-int	cd(char **cmd, t_data *data)
+int	cd_builtin(char **cmd, t_data *data)
 {
-	int	index;
-
-	index = -1;
 	if (matriz_len(cmd) == 1)
 	{
-		while (data->environ[++index])
-			if (ft_strncmp("HOME=", data->environ[index], 5) == 0)
+		while (data->environ->next)
+			if (ft_strncmp("HOME=", data->environ->content, 5) == 0)
 				break;
-		chdir(data->environ[index] + 5);
+		chdir(data->environ->content + 5);
 	}
 	else
 		chdir(cmd[1]);
@@ -32,12 +29,49 @@ int	cd(char **cmd, t_data *data)
 	return (1);
 }
 
-int	env(t_data *data)
+int	env_builtin(t_data *data)
 {
-	int	index;
+	t_list	*temp;
 
-	index = -1;
-	while (data->environ[++index])
-		printf("%s\n", data->environ[index]);
+	temp = data->environ;
+	while (temp)
+	{
+		printf("%s\n", (char *)temp->content);
+		temp = temp->next;
+	}
 	return (1);
+}
+
+int	export_builtin(char **cmd, t_data *data)
+{
+	ft_lstadd_back(&data->environ, ft_lstnew(cmd[1]));
+	return (1);
+}
+
+int	ft_lstdelif(t_list **lst, char *ref);
+
+int	unset_builtin(char **cmd, t_data *data)
+{
+	ft_lstdelif(&data->environ, cmd[1]);
+	return (1);
+}
+
+int	ft_lstdelif(t_list **lst, char *ref)
+{
+	t_list	*temp;
+	
+	temp = *lst;
+	if (!lst || !*lst)
+		return (0);
+	if (ft_strncmp(temp->content, ref, ft_strlen(ref)) == 0)
+	{
+		//del node
+		*lst = temp->next;
+		free(temp->content);
+		free(temp);
+		ft_lstdelif(lst, ref);
+	}
+	else
+		ft_lstdelif(&temp->next, ref);
+	return (0);
 }

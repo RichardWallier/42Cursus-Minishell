@@ -6,7 +6,7 @@
 /*   By: rwallier <rwallier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 18:52:16 by rwallier          #+#    #+#             */
-/*   Updated: 2023/03/01 21:22:14 by rwallier         ###   ########.fr       */
+/*   Updated: 2023/03/05 23:00:25 by rwallier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,8 @@ typedef struct s_data {
 	char	**prompt;
 	char	*bash;
 	char	*pwd;
-	char	**environ;
+	char	**environ_pointer;
+	t_list	*environ;
 }				t_data;
 
 void	wrong_path(void);
@@ -38,10 +39,16 @@ char	*ft_substr_free(char *str, unsigned int start, size_t len);
 
 char	*ft_strjoin_free(char *s1, char const *s2);
 
+int		parse_env(t_data *data, char **environ);
+
 // Built in commands
 
-int		env(t_data *data);
+int		env_builtin(t_data *data);
 
-int		cd(char **path, t_data *data);
+int		cd_builtin(char **path, t_data *data);
+
+int		export_builtin(char **cmd, t_data *data);
+
+int		unset_builtin(char **cmd, t_data *data);
 
 #endif // !MINISHELL_H

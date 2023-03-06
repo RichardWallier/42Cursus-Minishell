@@ -6,7 +6,7 @@
 /*   By: rwallier <rwallier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 18:52:01 by rwallier          #+#    #+#             */
-/*   Updated: 2023/03/01 21:23:38 by rwallier         ###   ########.fr       */
+/*   Updated: 2023/03/05 23:00:00 by rwallier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,8 @@ int	main(void)
 	extern char	**environ;
 
 	data.pwd = getcwd(NULL, 0);
-	data.environ = environ;
+	parse_env(&data, environ);
+
 	while (42)
 	{
 		data.bash = ft_strjoin(data.pwd, "$ ");
@@ -28,9 +29,13 @@ int	main(void)
 		data.prompt = ft_split2(temp, ' ');
 		free(data.bash);
 		if (ft_strncmp(*data.prompt, "cd", ft_strlen(*data.prompt)) == 0)
-			cd(data.prompt, &data);
+			cd_builtin(data.prompt, &data);
 		else if (ft_strncmp(*data.prompt, "env", ft_strlen(*data.prompt)) == 0)
-			env(&data);
+			env_builtin(&data);
+		else if (ft_strncmp(*data.prompt, "export", ft_strlen(*data.prompt)) == 0)
+			export_builtin(data.prompt, &data);
+		else if (ft_strncmp(*data.prompt, "unset", ft_strlen(*data.prompt)) == 0)
+			unset_builtin(data.prompt, &data);
 		else
 		{
 			pid = fork();

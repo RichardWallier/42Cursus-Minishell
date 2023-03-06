@@ -6,11 +6,11 @@
 #    By: rwallier <rwallier@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/02/12 18:52:08 by rwallier          #+#    #+#              #
-#    Updated: 2023/02/16 19:01:42 by rwallier         ###   ########.fr        #
+#    Updated: 2023/03/05 13:29:41 by rwallier         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-SOURCE	=	main.c command.c errorhandler.c utils.c builtin.c
+SOURCE	=	main.c command.c errorhandler.c utils.c builtin.c parse.c
 
 OBJECTS	=	$(SOURCE:.c=.o)
 
@@ -22,7 +22,7 @@ MAKE	=	make -C
 
 NAME	=	minishell
 
-CFLAGS	=	-Wall -Wextra -Werror -g
+CFLAGS	= -g
 
 LIBFILES	=	-lreadline
 
@@ -34,6 +34,7 @@ all:	$(NAME)
 
 $(LIBFT):
 	@$(MAKE) $(LIBFTPATH)
+	@$(MAKE) $(LIBFTPATH) bonus
 
 $(NAME):	$(SOURCE) $(LIBFT)
 	@$(CC) $(CFLAGS) $(SOURCE) $(LIBFT) -o $(NAME) $(LIBFILES) 
