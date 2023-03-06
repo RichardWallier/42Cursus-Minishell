@@ -6,7 +6,7 @@
 /*   By: rwallier <rwallier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/16 18:29:46 by rwallier          #+#    #+#             */
-/*   Updated: 2023/03/05 23:02:16 by rwallier         ###   ########.fr       */
+/*   Updated: 2023/03/05 23:08:13 by rwallier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,6 @@ int	export_builtin(char **cmd, t_data *data)
 	return (1);
 }
 
-int	ft_lstdelif(t_list **lst, char *ref);
 
 int	unset_builtin(char **cmd, t_data *data)
 {
@@ -56,22 +55,3 @@ int	unset_builtin(char **cmd, t_data *data)
 	return (1);
 }
 
-int	ft_lstdelif(t_list **lst, char *ref)
-{
-	t_list	*temp;
-	
-	temp = *lst;
-	if (!lst || !*lst)
-		return (0);
-	if (ft_strncmp(temp->content, ref, ft_strlen(ref)) == 0)
-	{
-		//del node
-		*lst = temp->next;
-		free(temp->content);
-		free(temp);
-		ft_lstdelif(lst, ref);
-	}
-	else
-		ft_lstdelif(&temp->next, ref);
-	return (0);
-}
