@@ -6,7 +6,7 @@
 /*   By: rwallier <rwallier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 18:52:01 by rwallier          #+#    #+#             */
-/*   Updated: 2023/03/05 23:00:00 by rwallier         ###   ########.fr       */
+/*   Updated: 2023/03/05 23:14:59 by rwallier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,8 @@ int	main(void)
 			export_builtin(data.prompt, &data);
 		else if (ft_strncmp(*data.prompt, "unset", ft_strlen(*data.prompt)) == 0)
 			unset_builtin(data.prompt, &data);
+		else if (ft_strncmp(*data.prompt, "exit", ft_strlen(*data.prompt)) == 0)
+			exit_builtin(&data);
 		else
 		{
 			pid = fork();

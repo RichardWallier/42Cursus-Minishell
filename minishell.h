@@ -6,7 +6,7 @@
 /*   By: rwallier <rwallier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 18:52:16 by rwallier          #+#    #+#             */
-/*   Updated: 2023/03/05 23:00:25 by rwallier         ###   ########.fr       */
+/*   Updated: 2023/03/05 23:14:42 by rwallier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,5 +50,7 @@ int		cd_builtin(char **path, t_data *data);
 int		export_builtin(char **cmd, t_data *data);
 
 int		unset_builtin(char **cmd, t_data *data);
+
+int	exit_builtin(t_data *data);
 
 #endif // !MINISHELL_H

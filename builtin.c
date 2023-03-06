@@ -6,7 +6,7 @@
 /*   By: rwallier <rwallier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/16 18:29:46 by rwallier          #+#    #+#             */
-/*   Updated: 2023/03/05 23:08:13 by rwallier         ###   ########.fr       */
+/*   Updated: 2023/03/05 23:14:31 by rwallier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,3 +55,9 @@ int	unset_builtin(char **cmd, t_data *data)
 	return (1);
 }
 
+
+int	exit_builtin(t_data *data)
+{
+	exit(EXIT_SUCCESS);
+	return (1);
+}
