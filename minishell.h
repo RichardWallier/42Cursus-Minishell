@@ -6,7 +6,7 @@
 /*   By: rwallier <rwallier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 18:52:16 by rwallier          #+#    #+#             */
-/*   Updated: 2023/03/05 23:29:00 by rwallier         ###   ########.fr       */
+/*   Updated: 2023/04/02 18:05:13 by rwallier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,12 @@ typedef struct s_data {
 	char	**environ_pointer;
 	t_list	*environ;
 }				t_data;
+
+typedef struct s_linked_list {
+	void*					content;
+	int						flag;
+	struct s_linked_list	*next;
+}				t_linked_list;
 
 void	wrong_path(void);
 
