@@ -6,7 +6,7 @@
 /*   By: rwallier <rwallier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 18:52:16 by rwallier          #+#    #+#             */
-/*   Updated: 2023/04/02 18:05:13 by rwallier         ###   ########.fr       */
+/*   Updated: 2023/05/20 23:30:06 by rwallier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,8 @@ char *ft_strjoin_free(char *s1, char const *s2);
 int free_split(char **split);
 
 int parse_env(t_data *data, char **environ);
+
+int is_only_whitespaces(char *str);
 
 // Built in commands
 
