@@ -13,7 +13,8 @@
 #include "libft/libft.h"
 #include "minishell.h"
 
-int cd_builtin(char **cmd, t_data *data) {
+int cd_builtin(char **cmd, t_data *data)
+{
   if (matriz_len(cmd) == 1) {
     while (data->environ->next)
       if (ft_strncmp("HOME=", data->environ->content, 5) == 0)
@@ -26,7 +27,8 @@ int cd_builtin(char **cmd, t_data *data) {
   return (1);
 }
 
-int env_builtin(t_data *data) {
+int env_builtin(t_data *data)
+{
   t_list *temp;
 
   temp = data->environ;
@@ -37,17 +39,20 @@ int env_builtin(t_data *data) {
   return (1);
 }
 
-int export_builtin(char **cmd, t_data *data) {
+int export_builtin(char **cmd, t_data *data)
+{
   ft_lstadd_back(&data->environ, ft_lstnew(cmd[1]));
   return (1);
 }
 
-int unset_builtin(char **cmd, t_data *data) {
+int unset_builtin(char **cmd, t_data *data)
+{
   ft_lstdelif(&data->environ, cmd[1]);
   return (1);
 }
 
-int exit_builtin(t_data *data) {
+int exit_builtin(t_data *data)
+{
   int index;
 
   index = 0;
@@ -58,14 +63,16 @@ int exit_builtin(t_data *data) {
   return (1);
 }
 
-int echo_builtin(char **cmd, t_data *data) {
+int echo_builtin(char **cmd, t_data *data) 
+{
   char *to_print;
   int index;
   int new_line;
 
   index = 0;
   new_line = 1;
-  if (ft_strncmp(cmd[1], "-n", ft_strlen(cmd[1])) == 0) {
+  if (ft_strncmp(cmd[1], "-n", ft_strlen(cmd[1])) == 0)
+	{
     index++;
     new_line = 0;
   }
@@ -73,6 +80,5 @@ int echo_builtin(char **cmd, t_data *data) {
     ft_printf("%s ", cmd[index]);
   if (new_line)
     ft_printf("\n", cmd[1]);
-
   return 1;
 }

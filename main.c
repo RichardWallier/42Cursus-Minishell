@@ -12,7 +12,8 @@
 
 #include "minishell.h"
 
-int main(void) {
+int main(void)
+{
   t_data data;
   int pid;
   char *temp;
@@ -21,7 +22,8 @@ int main(void) {
   data.pwd = getcwd(NULL, 0);
   parse_env(&data, environ);
 
-  while (42) {
+  while (42)
+	{
     data.bash = ft_strjoin(data.pwd, "$ ");
     temp = readline(data.bash);
     free(data.bash);
@@ -41,7 +43,8 @@ int main(void) {
       echo_builtin(data.prompt, &data);
     else if (ft_strncmp(*data.prompt, "exit", ft_strlen(*data.prompt)) == 0)
       exit_builtin(&data);
-    else {
+    else
+    {
       pid = fork();
       if (pid == 0)
         run_commands(data.prompt, environ);
