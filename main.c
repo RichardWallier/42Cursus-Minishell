@@ -6,7 +6,7 @@
 /*   By: rwallier <rwallier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 18:52:01 by rwallier          #+#    #+#             */
-/*   Updated: 2023/03/05 23:29:12 by rwallier         ###   ########.fr       */
+/*   Updated: 2023/05/20 23:34:01 by rwallier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,8 @@ int	main(void)
 		temp = readline(data.bash);
 		free(data.bash);
 		data.prompt = ft_split2(temp, ' ');
+		if (!is_only_whitespaces(temp))
+			add_history(temp);
 		free(temp);
 		if (ft_strncmp(*data.prompt, "cd", ft_strlen(*data.prompt)) == 0)
 			cd_builtin(data.prompt, &data);

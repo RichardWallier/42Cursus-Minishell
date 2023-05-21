@@ -6,7 +6,7 @@
 /*   By: rwallier <rwallier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/16 18:49:12 by rwallier          #+#    #+#             */
-/*   Updated: 2023/03/05 23:28:35 by rwallier         ###   ########.fr       */
+/*   Updated: 2023/05/20 23:29:36 by rwallier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,5 +74,20 @@ int	free_split(char **split)
 	while (split[index])
 		free(split[index++]);
 	free(split);
+	return (1);
+}
+
+int	is_only_whitespaces(char *str)
+{
+	int	index;
+
+	index = 0;
+	while (*str)
+	{
+		if(*str != ' ' || *str != '\t' || *str != '\n' || *str != '\r'
+		|| *str != '\v' || *str != '\f')
+			return(0);
+		str++;
+	}
 	return (1);
 }
