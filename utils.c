@@ -6,7 +6,7 @@
 /*   By: rwallier <rwallier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/16 18:49:12 by rwallier          #+#    #+#             */
-/*   Updated: 2023/05/20 23:29:36 by rwallier         ###   ########.fr       */
+/*   Updated: 2023/06/05 11:11:48 by rwallier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,6 +81,8 @@ int	is_only_whitespaces(char *str)
 {
 	int	index;
 
+	if (!str)
+		return (0);
 	index = 0;
 	while (*str)
 	{

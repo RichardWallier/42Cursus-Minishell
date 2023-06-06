@@ -6,7 +6,7 @@
 /*   By: rwallier <rwallier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 18:52:16 by rwallier          #+#    #+#             */
-/*   Updated: 2023/05/20 23:30:06 by rwallier         ###   ########.fr       */
+/*   Updated: 2023/06/05 11:17:25 by rwallier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@
 # include <limits.h>
 
 typedef struct s_data {
-	char	**prompt;
+	t_word	*prompt;
 	char	*bash;
 	char	*pwd;
 	char	**environ_pointer;
@@ -34,6 +34,19 @@ typedef struct s_linked_list {
 	int						flag;
 	struct s_linked_list	*next;
 }				t_linked_list;
+
+typedef struct s_word
+{
+	char			*word;
+	unsigned int	flag;
+	int				fd_in;
+	int				fd_out;
+	int				ret;
+	pid_t			pid;
+	struct s_word	*head;
+	struct s_list	*env_lst;
+	struct s_word	*next;
+}	t_word;
 
 void	wrong_path(void);
 

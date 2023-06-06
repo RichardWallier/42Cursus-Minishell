@@ -6,7 +6,7 @@
 /*   By: rwallier <rwallier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/16 18:29:46 by rwallier          #+#    #+#             */
-/*   Updated: 2023/03/05 23:29:26 by rwallier         ###   ########.fr       */
+/*   Updated: 2023/06/05 10:55:50 by rwallier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ int	env_builtin(t_data *data)
 
 int	export_builtin(char **cmd, t_data *data)
 {
-	ft_lstadd_back(&data->environ, ft_lstnew(cmd[1]));
+	ft_lstadd_back(&(data->environ), ft_lstnew(cmd[1]));
 	return (1);
 }
 
