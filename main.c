@@ -6,14 +6,14 @@
 /*   By: rwallier <rwallier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 18:52:01 by rwallier          #+#    #+#             */
-/*   Updated: 2023/06/05 12:57:05 by rwallier         ###   ########.fr       */
+/*   Updated: 2023/06/07 18:12:00 by rwallier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
 int	check_quote(char *line);
-int	next_quote(char *line);
+int	get_next_quotes(char *line);
 t_word	*ms_lstnew(void *word);
 void	ms_lstadd_back(t_word **lst, t_word *new);
 t_word	*parse_prompt(char *line, t_list *env_lst);
@@ -32,45 +32,399 @@ int	main(void)
 
 	while (42)
 	{
-		data.bash = ft_strjoin(data.pwd, "$ ");
+		data.bash = ft_strjoin(data.pwd, "$ ", 0);
 		line = readline(data.bash);
 		free(data.bash);
 		if (!line)
 			exit_builtin(&data);
 		if (!is_only_whitespaces(line))
 			add_history(line);
-		parser(&line, &data);
-		// if (ft_strncmp(*data.prompt, "cd", ft_strlen(*data.prompt)) == 0)
-		// 	cd_builtin(data.prompt, &data);
-		// else if (ft_strncmp(*data.prompt, "env", ft_strlen(*data.prompt)) == 0)
-		// 	env_builtin(&data);
-		// else if (ft_strncmp(*data.prompt, "export", ft_strlen(*data.prompt)) == 0)
-		// 	export_builtin(data.prompt, &data);
-		// else if (ft_strncmp(*data.prompt, "unset", ft_strlen(*data.prompt)) == 0)
-		// 	unset_builtin(data.prompt, &data);
-		// else if (ft_strncmp(*data.prompt, "exit", ft_strlen(*data.prompt)) == 0)
-			// exit_builtin(&data);
-		// else
-		// {
-			pid = fork();
-			if (pid == 0)
-				run_commands(data.prompt, environ);
-		// }
-		waitpid(pid, NULL, 0);
-		free_split(data.prompt);
+		if (parser(&line, &data)) 
+		{
+			ms_lstclear(&data.prompt, 1);
+			continue ;	
+		}
+		ms_executor(&data.prompt, &data.environ, 0);// TODO
+		ms_wait_cmds(data.prompt);//TODO
+		ms_lstclear(&data.prompt, 1);//TODO
 	}
 	return (0);
 }
 
-int	ms_lexxer(t_word **word_lst)
+int	get_flag_word(char *word, int last_flag)
+{
+	if (!word)
+		return (-1);
+	if (ft_strncmp(word, "|", 2) == 0)
+		return (MS_PIPE);
+	else if (ft_strncmp(word, "<<", 3) == 0)
+		return (MS_HEREDOC);
+	else if (ft_strncmp(word, ">>", 3) == 0)
+		return (MS_APPEND);
+	else if (ft_strncmp(word, "<", 2) == 0)
+		return (MS_REDIRECT_IN);
+	else if (ft_strncmp(word, ">", 2) == 0)
+		return (MS_REDIRECT_OUT);
+	else if (last_flag == MS_REDIRECT_OUT || last_flag == MS_REDIRECT_IN
+		|| last_flag == MS_HEREDOC || last_flag == MS_APPEND)
+		return (MS_REDIRECT_FILE);
+	return (MS_WORD);
+}
+
+int	valid_environment_name(char *line)
+{
+	if (line && line[1] == '?')
+		return (0);
+	if (!line || *line != '$' || !ft_isalnum(line[1]))
+		return (1);
+	return (0);
+}
+
+int	get_len_decimal(int n)
+{
+	int	len;
+
+	len = 0;
+	while (n != 0)
+	{
+		n = n / 10;
+		len++;
+	}
+	return (len);
+}
+
+int	get_environment_name_len(char *line)
+{
+	int	word_len;
+
+	if (!line)
+		return (0);
+	word_len = 0;
+	line++;
+	if (*line == '?')
+		return (1);
+	while (line && *line && ft_isalpha(*line))
+	{
+		word_len++;
+		line++;
+	}
+	return (word_len);
+}
+
+char	*get_environment_node(t_list *env_node, char *env)
+{
+	char	*env_key;
+	char	*env_line;
+
+	env_line = NULL;
+	while (env_node)
+	{
+		env_line = env_node->content;
+		env_key = ft_substr(env_node->content,
+				0, ft_strchr(env_line, '=') - env_line);
+		if (!ft_strncmp(env_key, env, ft_strlen(env_key) + 1))
+		{
+			free(env_key);
+			break ;
+		}
+		free(env_key);
+		env_node = env_node->next;
+	}
+	if (!env_node)
+		return (NULL);
+	if (env_line)
+		env_line = ft_strchr(env_line, '=') + 1;
+	return (env_line);
+}
+
+void	expand_environment_utils_check_line(char *line, char *ret_line, t_pos *aux, t_list *env)
+{
+	char					*env_value;
+	int						env_len;
+	extern unsigned int		g_exit_status;
+
+	if (line[aux->i + 1] == '?')
+	{
+		if (g_exit_status == 0)
+			env_len = 1;
+		else
+			env_len = count_decimal(g_exit_status);
+		env_value = ft_itoa(g_exit_status);
+		ft_memcpy(&ret_line[aux->j], env_value, env_len);
+	}
+	else
+	{
+		env_value = ft_substr(&line[aux->i], 1,
+				get_environment_name_len(&line[aux->i]));
+		env_len = ft_strlen(get_environment_node(env, env_value));
+		ft_memcpy(&ret_line[aux->j], get_environment_node(env, env_value), env_len);
+	}
+	aux->i += get_environment_name_len(&line[aux->i]) + 1;
+	aux->j += env_len;
+	free(env_value);
+	return ;
+}
+
+void	expand_environment_util(char *line, char *ret_line, t_list *env)
+{
+	t_pos	aux;
+	char	must_expand;
+	char	in_double_quotes;
+
+	aux = (t_pos){0};
+	must_expand = 1;
+	in_double_quotes = 1;
+	while (line[aux.i])
+	{
+		if (line[aux.i] == '\"' && must_expand)
+			in_double_quotes ^= 1;
+		if (line[aux.i] == '\'' && in_double_quotes)
+			must_expand ^= 1;
+		if (line[aux.i] == '$' && must_expand
+			&& !valid_environment_name(&line[aux.i]))
+			expand_environment_utils_check_line(line, ret_line, &aux, env);
+		else
+		{
+			ret_line[aux.j] = line[aux.i];
+			aux.i++;
+			aux.j++;
+		}
+	}
+	return ;
+}
+
+int	get_expand_environment_len(char *line, t_list *env)
+{
+	char				*env_word;
+	int					len;
+	extern unsigned int	g_exit_status;
+
+	if (line && line[1] == '?')
+	{
+		if (g_exit_status == 0)
+			return (1);
+		else
+			return (count_decimal(g_exit_status));
+	}
+	env_word = ft_substr(line, 1, get_environment_name_len(line));
+	len = ft_strlen(get_environment_node(env, env_word));
+	if (env_word)
+		free(env_word);
+	return (len);
+}
+
+int	get_environment_len_after_expand(char *line, t_list *env)
+{
+	int		final_len;
+	char	must_expand;
+	char	in_double_quotes;
+
+	in_double_quotes = 0;
+	must_expand = 1;
+	final_len = 0;
+	while (*line)
+	{
+		if (*line == '\"' && must_expand)
+			in_double_quotes ^= 1;
+		if (*line == '\'' && !in_double_quotes)
+			must_expand ^= 1;
+		if (*line == '$' && must_expand && !valid_environment_name(line))
+		{
+			final_len += get_expand_environment_len(line, env);
+			line += get_environment_name_len(line) + 1;
+		}
+		else
+		{
+			final_len++;
+			line++;
+		}
+	}
+	return (final_len);
+}
+
+char	*expand_environment(char *line, t_list *env)
+{
+	char	*ret_line;
+
+	ret_line = ft_calloc(get_environment_len_after_expand(line, env) + 1,
+			sizeof(char));
+	if (ret_line)
+		expand_environment_util(line, ret_line, env);
+	free(line);
+	return (ret_line);
+}
+
+static void	set_quote_with_null(char *line)
+{
+	int	next_quotes;
+
+	if (!line)
+		return ;
+	while (*line)
+	{
+		if (*line == '\'' || *line == '\"')
+		{
+			next_quotes = get_next_quotes(line);
+			*line = '\0';
+			line += next_quotes;
+			*line = '\0';
+			line++;
+		}
+		else
+			line++;
+	}
+	return ;
+}
+
+char	*remove_quotes(char *line, int flag)
+{
+	char	*ret_word;
+	int		i;
+	int		len;
+
+	if (!line)
+		return (NULL);
+	len = ft_strlen(line);
+	ret_word = NULL;
+	i = 0;
+	if (!(ft_strchr(line, '\'') || ft_strchr(line, '\"')))
+		return (line);
+	set_quote_with_null(line);
+	while (!line[i] && i < len)
+		i++;
+	while (i < len)
+	{
+		ret_word = ft_strjoin(ret_word, &line[i], 1);
+		i += ft_strlen(&line[i]) + 1;
+		while (!line[i] && i < len)
+			i++;
+	}
+	if (flag)
+		free(line);
+	return (ret_word);
+}
+
+int	lexx(t_word **lst)
+{
+	t_word	*node;
+	int		last_flag;
+
+	if (!lst || !*lst)
+		return (1);
+	node = *lst;
+	last_flag = 0;
+	while (node)
+	{
+		if (node->word)
+		{
+			node->flag = get_flag_word(node->word, last_flag);
+			node->word = expand_environment(node->word, node->env_lst);
+			node->word = remove_quotes(node->word, 1);
+			last_flag = node->flag;
+		}
+		node = node->next;
+	}
+	ms_lst_remove_empty_word(lst);
+	return (0);
+}
+
+int	analyze_pipe_syntax(t_word *word_lst)
+{
+	t_word	*node;
+	int		last_flag;
+
+	if (!word_lst)
+		return (-1);
+	node = word_lst;
+	last_flag = MS_PIPE;
+	while (node)
+	{
+		if ((last_flag == MS_PIPE && node->flag == MS_PIPE)
+			|| (!node->next && node->flag == MS_PIPE))
+		{
+			printf("Syntax error: Incorrect use of pipes\n");
+			return (-1);
+		}
+		last_flag = node->flag;
+		node = node->next;
+	}
+	return (0);
+}
+
+int	analyze_redirect_syntax(t_word *word_lst)
+{
+	t_word	*node;
+
+	if (!word_lst)
+		return (-1);
+	node = word_lst;
+	while (node)
+	{
+		if (node->flag == MS_REDIRECT_IN || node->flag == MS_REDIRECT_OUT
+			|| node->flag == MS_HEREDOC || node->flag == MS_APPEND)
+		{
+			if (!node->next || node->next->flag != MS_REDIRECT_FILE)
+			{
+				printf("Syntax error: error on '%s'\n", node->word);
+				return (-1);
+			}
+		}
+		node = node->next;
+	}
+	return (0);
+}
+
+int	syntax_analyze(t_word *word_lst)
+{
+	if (!word_lst)
+		return (-1);
+	else if (analyze_pipe_syntax(word_lst))
+		return (-1);
+	else if (analyze_redirect_syntax(word_lst))
+		return (-1);
+	return (0);
+}
+
+int	get_command_count(t_word *node)
+{
+	int	cmd_count;
+
+	cmd_count = 0;
+	while (node && node->flag != MS_PIPE)
+	{
+		if (node->flag == MS_WORD)
+			cmd_count++;
+		node = node->next;
+	}
+	return (cmd_count);
+}
+
+int	analyze_command_syntax(t_word *word_lst)
+{
+	while (word_lst)
+	{
+		if (get_command_count(word_lst) == 0)
+		{
+			ft_putstr_fd("Syntax error: sentence w/no command\n", STDERR_FILENO);
+			return (1);
+		}
+		while (word_lst && word_lst->flag != MS_PIPE)
+			word_lst = word_lst->next;
+		if (word_lst)
+			word_lst = word_lst->next;
+	}
+	return (0);
+}
+
+int	lexical_analyzer(t_word **word_lst)
 {
 	if (!word_lst)
 		return (1);
-	if (ms_analyze_lexx(word_lst))
+	if (lexx(word_lst))
 		return (1);
-	if (ms_analyze_syntax(*word_lst))
+	if (syntax_analyze(*word_lst))
 		return (1);
-	if (ms_analyze_cmd_syntax(*word_lst))
+	if (analyze_command_syntax(*word_lst))
 		return (1);
 	return (0);
 }
@@ -87,7 +441,7 @@ int	parser(char *line, t_data *data)
 		return (-1);
 	}
 	data->prompt = parse_prompt(line, data->environ);
-	error = ms_lexxer(data->prompt); // TODO
+	error = lexical_analyzer(data->prompt);
 	free(line);
 	return (error);
 }
@@ -143,8 +497,8 @@ int	get_word_len(char *line)
 	{
 		if (*line == '\'' || *line == '\"')
 		{
-			word_len += next_quote(line) + 1;
-			line += next_quote(line) + 1;
+			word_len += get_next_quotes(line) + 1;
+			line += get_next_quotes(line) + 1;
 		}
 		else
 		{
@@ -162,6 +516,26 @@ int	is_meta_char(char *c)
 	else if (*c == '|' || *c == '>' || *c == '<')
 		return (1);
 	return (0);
+}
+
+void	ms_lstclear(t_word **lst, int flag)
+{
+	t_word	*aux;
+	t_word	*node;
+
+	if (!lst || !(*lst))
+		return ;
+	node = *lst;
+	while (node)
+	{
+		aux = node->next;
+		free(node->word);
+		free(node);
+		node = aux;
+	}
+	if (flag)
+		*lst = NULL;
+	return ;
 }
 
 t_word	*ms_lstnew(void *word)
@@ -210,7 +584,7 @@ int	check_quote(char *line)
 	{
 		if (*line == '\'' || *line == '\"')
 		{
-			quote_distance = next_quote(line);
+			quote_distance = get_next_quotes(line);
 			if (quote_distance == -1)
 				return (1);
 			line += quote_distance + 1;
@@ -221,7 +595,7 @@ int	check_quote(char *line)
 	return (0);
 }
 
-int	next_quote(char *line)
+int	get_next_quotes(char *line)
 {
 	char	quote;
 	int		next_quote_distance;

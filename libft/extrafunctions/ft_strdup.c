@@ -6,21 +6,27 @@
 /*   By: rwallier <rwallier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/09 17:11:03 by rwallier          #+#    #+#             */
-/*   Updated: 2022/05/17 10:25:56 by rwallier         ###   ########.fr       */
+/*   Updated: 2023/06/07 17:44:01 by rwallier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-char	*ft_strdup(char *s1)
+char	*ft_strdup(char *s1, int flag)
 {
-	char	*new;
-	size_t	len;
+	int		len;
+	char	*ptr;
 
-	len = ft_strlen(s1);
-	new = (char *)malloc(len * sizeof(char) + 1);
-	if (new == NULL)
+	len = 0;
+	while (s1[len])
+		len++;
+	ptr = malloc(len + 1);
+	if (ptr == NULL)
 		return (NULL);
-	ft_strlcpy(new, s1, len + 1);
-	return (new);
+	ptr[len] = 0;
+	while (len-- > 0)
+		ptr[len] = s1[len];
+	if (flag && s1)
+		free(s1);
+	return (ptr);
 }

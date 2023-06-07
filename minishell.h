@@ -6,7 +6,7 @@
 /*   By: rwallier <rwallier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 18:52:16 by rwallier          #+#    #+#             */
-/*   Updated: 2023/06/05 11:17:25 by rwallier         ###   ########.fr       */
+/*   Updated: 2023/06/07 18:11:24 by rwallier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,6 @@ typedef struct s_data {
 	t_word	*prompt;
 	char	*bash;
 	char	*pwd;
-	char	**environ_pointer;
 	t_list	*environ;
 }				t_data;
 
@@ -47,6 +46,23 @@ typedef struct s_word
 	struct s_list	*env_lst;
 	struct s_word	*next;
 }	t_word;
+
+typedef struct s_pos
+{
+	int	i;
+	int	j;
+}	t_pos;
+
+enum e_token
+{
+	MS_WORD = 1,
+	MS_PIPE = 2,
+	MS_REDIRECT_IN = 4,
+	MS_REDIRECT_OUT = 8,
+	MS_REDIRECT_FILE = 16,
+	MS_APPEND = 32,
+	MS_HEREDOC = 64,
+};
 
 void	wrong_path(void);
 
