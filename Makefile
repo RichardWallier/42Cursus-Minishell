@@ -6,11 +6,11 @@
 #    By: rwallier <rwallier@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/02/12 18:52:08 by rwallier          #+#    #+#              #
-#    Updated: 2023/03/05 13:29:41 by rwallier         ###   ########.fr        #
+#    Updated: 2023/06/25 15:14:47 by rwallier         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-SOURCE	=	main.c command.c errorhandler.c utils.c builtin.c parse.c
+SOURCE	=	main.c
 
 OBJECTS	=	$(SOURCE:.c=.o)
 

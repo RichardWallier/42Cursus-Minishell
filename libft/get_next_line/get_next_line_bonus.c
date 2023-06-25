@@ -6,7 +6,7 @@
 /*   By: rwallier <rwallier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/01 17:40:55 by rwallier          #+#    #+#             */
-/*   Updated: 2022/06/04 18:21:09 by rwallier         ###   ########.fr       */
+/*   Updated: 2023/06/25 15:26:27 by rwallier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ char	*make_line_no_nl(char *line, char *buffer)
 	else
 	{
 		temp = line;
-		line = ft_strjoin(line, buffer);
+		line = ft_strjoin2(line, buffer);
 		free(temp);
 	}
 	if (!ft_strlen(line))
@@ -79,7 +79,7 @@ char	*make_line_with_nl(char *buffer, char **trash, char *line)
 		temp = NULL;
 	}
 	else
-		line = ft_strjoin(line, temp);
+		line = ft_strjoin2(line, temp);
 	free(temp);
 	free(buffer);
 	if (!ft_strlen(line))
