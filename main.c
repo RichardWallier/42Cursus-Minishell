@@ -53,7 +53,7 @@ int	main(void)
 			exit_builtin(&data.prompt, &data.environ);
 		if (!is_only_whitespaces(line))
 			add_history(line);
-		if (parser(&line, &data)) 
+		if (parser(line, &data)) 
 		{
 			ms_lstclear(&data.prompt, 1);
 			continue ;	
