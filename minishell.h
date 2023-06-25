@@ -6,7 +6,7 @@
 /*   By: rwallier <rwallier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 18:52:16 by rwallier          #+#    #+#             */
-/*   Updated: 2023/06/25 15:55:58 by rwallier         ###   ########.fr       */
+/*   Updated: 2023/06/25 16:09:36 by rwallier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,6 +94,10 @@ static int	check_bin_path(char **cmd, t_list *env);
 
 int	is_builtin(t_word *node);
 
+void	delete_environment(t_list **node, char *ref);
+char	*get_environment_node(t_list *env_node, char *env);
+int	update_environment(t_list *env_lst, char *ref, char *newvalue);
+
 // Ms lst functions
 
 void	ms_lstclear(t_word **lst, int flag);
@@ -105,10 +109,13 @@ char	**lst_to_matrix(t_word *node);
 int		echo_builtin(t_word *node);
 
 int		cd_builtin(t_word *node);
+int		cd_with_params(t_word *node);
+int		cd_without_params(t_word *node);
 
 int		pwd_builtin(t_word *node);
 
 int		export_builtin(t_word *node);
+void	export_util(char *arg, t_word *node);
 
 int		env_builtiin(t_word *node);
 
