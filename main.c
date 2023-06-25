@@ -3,28 +3,28 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rwallier <rwallier@student.42.fr>          +#+  +:+       +#+        */
+/*   By: wcaetano <wcaetano@student.42.rio>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 18:52:01 by rwallier          #+#    #+#             */
-/*   Updated: 2023/06/25 15:55:03 by rwallier         ###   ########.fr       */
+/*   Updated: 2023/06/25 16:09:39 by wcaetano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int	check_quote(char *line);
-int	get_next_quotes(char *line);
+int		check_quote(char *line);
+int		get_next_quotes(char *line);
 t_word	*ms_lstnew(void *word);
 void	ms_lstadd_back(t_word **lst, t_word *new);
 t_word	*parse_prompt(char *line, t_list *env_lst);
-int	parser(char *line, t_data *data);
-int	is_meta_char(char *c);
-int	has_pipe(t_word *node);
-int	ms_pipe(t_word *node);
+int		parser(char *line, t_data *data);
+int		is_meta_char(char *c);
+int		has_pipe(t_word *node);
+int		ms_pipe(t_word *node);
 void	close_pipe(int *fd);
 t_word	*clean_sentence_redirections(t_word **lst, int flag);
 void	exec_no_pipe(t_word *node, t_list **env_lst);
-int	exec_bin(t_word *node, t_list *env_lst);
+int		exec_bin(t_word *node, t_list *env_lst);
 void	exec_builtin(t_word *node, t_list **env_lst, uint16_t builtin);
 char	*check_bin(char *cmd, t_list *env);
 void	free_matrix(char **mat);
@@ -32,6 +32,12 @@ void	close_all_fd(t_word *node);
 char	**node_to_matrix(t_word *node);
 char	**env_to_matrix(t_list *node);
 void	exit_builtin(t_word **word, t_list **env_lst);
+int		executor(t_word **lst, t_list **env_lst, int flag);
+void	wait_cmds(t_word *node);
+int		do_redirections(t_word *node);
+void	exec_pipe(t_word *node, t_list **env_lst);
+void	close_sentence_fd(t_word *node);
+
 
 
 int	main(void)
@@ -58,14 +64,15 @@ int	main(void)
 			ms_lstclear(&data.prompt, 1);
 			continue ;	
 		}
-		ms_executor(&data.prompt, &data.environ, 0);
-		ms_wait_cmds(data.prompt);
+		executor
+	(&data.prompt, &data.environ, 0);
+		wait_cmds(data.prompt);
 		ms_lstclear(&data.prompt, 1);
 	}
 	return (0);
 }
 
-void	ms_wait_cmds(t_word *node)
+void	wait_cmds(t_word *node)
 {
 	t_word				*aux;
 	extern unsigned int	g_exit_status;
@@ -89,7 +96,7 @@ void	ms_wait_cmds(t_word *node)
 	return ;
 }
 
-int	ms_executor(t_word **lst, t_list **env_lst, int flag)
+int	executor(t_word **lst, t_list **env_lst, int flag)
 {
 	t_word		*node;
 	t_word		**aux;
@@ -98,7 +105,7 @@ int	ms_executor(t_word **lst, t_list **env_lst, int flag)
 	ms_pipe(node);
 	while (node)
 	{
-		if (ms_do_redirections(node) != 0)
+		if (do_redirections(node) != 0)
 			return (1);
 		if (!flag)
 			node = clean_sentence_redirections(lst, 1);
@@ -108,7 +115,7 @@ int	ms_executor(t_word **lst, t_list **env_lst, int flag)
 			exec_no_pipe(node, env_lst); 
 		else
 			exec_pipe(node, env_lst);
-		ms_close_sentence_fd(node);
+		close_sentence_fd(node);
 		aux = ms_get_next_cmd_addr(node);
 		node = ms_get_next_command(node);
 		flag++;
@@ -137,7 +144,7 @@ t_word	**ms_get_next_cmd_addr(t_word *node)
 		return (NULL);
 }
 
-void	ms_close_sentence_fd(t_word *node)
+void	close_sentence_fd(t_word *node)
 {
 	while (node && node->flag != MS_PIPE)
 	{
@@ -854,7 +861,7 @@ int	ms_redirect_in(t_word *node)
 	return (0);
 }
 
-int	ms_do_redirections(t_word *node)
+int	do_redirections(t_word *node)
 {
 	if (!node)
 		return (0);
