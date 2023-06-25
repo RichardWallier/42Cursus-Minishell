@@ -6,7 +6,7 @@
 /*   By: rwallier <rwallier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 18:52:01 by rwallier          #+#    #+#             */
-/*   Updated: 2023/06/25 17:33:42 by rwallier         ###   ########.fr       */
+/*   Updated: 2023/06/25 17:52:14 by rwallier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -132,10 +132,10 @@ int	executor(t_word **lst, t_list **env_lst, int flag)
 			node = clean_sentence_redirections(lst, 1);
 		else
 			node = clean_sentence_redirections(aux, 0);
-		if (!has_pipe(*lst))
-			exec_no_pipe(node, env_lst); 
+		if (has_pipe(*lst))
+			exec_pipe(node, env_lst); 
 		else
-			exec_pipe(node, env_lst);
+			exec_no_pipe(node, env_lst);
 		close_sentence_fd(node);
 		aux = ms_get_next_cmd_addr(node);
 		node = ms_get_next_command(node);
@@ -183,6 +183,7 @@ void	exec_pipe(t_word *node, t_list **env_lst)
 	uint16_t	builtin;
 
 	builtin = is_builtin(node);
+	printf("FORK FORK FORK FORK\n");
 	node->pid = fork();
 	if (node->pid != 0)
 		return ;
@@ -526,8 +527,7 @@ int	cd_with_params(t_word *node)
 		&& node->next->next && node->next->next->flag == MS_WORD)
 		return (ft_putstr_fd("Ms: cd: too many arguments\n", STDERR_FILENO), 1);
 	pwd = getcwd(NULL, 0);
-	printf("WORD: %s\n", node->next->word);
-	chdir(node->next->word);
+	printf("WORD: -%s-\n", node->next->word);
 	if (chdir(node->next->word) == -1)
 	{
 		ft_putstr_fd("Ms: cd: no such file or dir\n", STDERR_FILENO);
@@ -916,10 +916,10 @@ int	has_pipe(t_word *node)
 	while (node)
 	{
 		if (node->flag == MS_PIPE)
-			return (0);
+			return (1);
 		node = node->next;
 	}
-	return (1);
+	return (0);
 }
 
 int	ms_pipe(t_word *node)
