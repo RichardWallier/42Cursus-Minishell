@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: rwallier <rwallier@student.42.fr>          +#+  +:+       +#+         #
+#    By: wcaetano <wcaetano@student.42.rio>         +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/02/12 18:52:08 by rwallier          #+#    #+#              #
-#    Updated: 2023/06/25 15:14:47 by rwallier         ###   ########.fr        #
+#    Updated: 2023/06/25 16:24:47 by wcaetano         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -22,7 +22,7 @@ MAKE	=	make -C
 
 NAME	=	minishell
 
-CFLAGS	= -g
+CFLAGS	= -g -L/opt/homebrew/opt/readline/lib -I/opt/homebrew/opt/readline/include
 
 LIBFILES	=	-lreadline
 

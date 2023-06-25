@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rwallier <rwallier@student.42.fr>          +#+  +:+       +#+        */
+/*   By: wcaetano <wcaetano@student.42.rio>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 18:52:01 by rwallier          #+#    #+#             */
-/*   Updated: 2023/06/25 16:21:44 by rwallier         ###   ########.fr       */
+/*   Updated: 2023/06/25 16:31:20 by wcaetano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,12 @@ void	wait_cmds(t_word *node);
 int		do_redirections(t_word *node);
 void	exec_pipe(t_word *node, t_list **env_lst);
 void	close_sentence_fd(t_word *node);
-
+int		get_word_len(char *line);
+int		redirect_in(t_word *node);
+int		str_is_num(char *str);
+void	exec_bin_pipe(t_word *node, t_list *env_lst);
+t_word	*ms_get_next_command(t_word *node);
+t_word	**ms_get_next_cmd_addr(t_word *node);
 
 
 int	main(void)
@@ -339,7 +344,7 @@ void	delete_environment(t_list **node, char *ref)
 		return ;
 	aux = *node;
 	env_key = ft_substr(aux->content, 0,
-			ft_strchr(aux->content, '=') - aux->content);
+			ft_strchr(aux->content, '=') - (char *) aux->content);
 	if (!ft_strncmp(ref, env_key, ft_strlen(env_key) + 1))
 	{
 		*node = aux->next;
@@ -607,7 +612,7 @@ char	**env_to_matrix(t_list *node)
 		mat[i] = ft_strdup(node->content, 0);
 		if (!mat[i])
 		{
-			ft_free_mat(mat);
+			free_matrix(mat);
 			return (NULL);
 		}
 		node = node->next;
@@ -655,28 +660,6 @@ void	close_all_fd(t_word *node)
 		node = node->next;
 	}
 	return ;
-}
-
-char	*check_bin(char *cmd, t_list *env)
-{
-	if (!cmd)
-		return (NULL);
-	if (cmd[0] == '/')
-	{
-		if (access(cmd, F_OK | X_OK) == 0)
-			return (ft_strdup(cmd, 0));
-		else
-		{
-			return (ft_putstr_fd("Ms: cmd not found\n", STDERR_FILENO), NULL);
-		}
-	}
-	cmd = ft_strjoin("/", cmd, 0);
-	if (check_bin_current_dir(&cmd) == 0)
-		return (cmd);
-	else if (check_bin_path(&cmd, env) == 0)
-		return (cmd);
-	free(cmd);
-	return (NULL);
 }
 
 int	check_bin_current_dir(char **cmd)
@@ -835,7 +818,7 @@ int	ms_heredoc(t_word *node)
 	return (fd[0]);
 }
 
-int	ms_redirect_in(t_word *node)
+int	redirect_in(t_word *node)
 {
 	t_word	*head;
 
@@ -861,7 +844,7 @@ int	ms_redirect_in(t_word *node)
 	return (0);
 }
 
-int	ms_redirect_out(t_word *node)
+int	redirect_out(t_word *node)
 {
 	t_word	*head;
 
@@ -892,7 +875,7 @@ int	do_redirections(t_word *node)
 {
 	if (!node)
 		return (0);
-	if (ms_redirect_in(node) || ms_redirect_out(node))
+	if (redirect_in(node) || redirect_out(node))
 		return (-1);
 	return (0);
 }
@@ -957,8 +940,8 @@ int	get_flag_word(char *word, int last_flag)
 	else if (ft_strncmp(word, "<", 2) == 0)
 		return (MS_REDIRECT_IN);
 	else if (ft_strncmp(word, ">", 2) == 0)
-		return (MS_REDIRECT_OUT);
-	else if (last_flag == MS_REDIRECT_OUT || last_flag == MS_REDIRECT_IN
+		return (redirect_out);
+	else if (last_flag == redirect_out || last_flag == MS_REDIRECT_IN
 		|| last_flag == MS_HEREDOC || last_flag == MS_APPEND)
 		return (MS_REDIRECT_FILE);
 	return (MS_WORD);
@@ -1253,7 +1236,7 @@ int	analyze_redirect_syntax(t_word *word_lst)
 	node = word_lst;
 	while (node)
 	{
-		if (node->flag == MS_REDIRECT_IN || node->flag == MS_REDIRECT_OUT
+		if (node->flag == MS_REDIRECT_IN || node->flag == redirect_out
 			|| node->flag == MS_HEREDOC || node->flag == MS_APPEND)
 		{
 			if (!node->next || node->next->flag != MS_REDIRECT_FILE)
@@ -1334,7 +1317,7 @@ int	parser(char *line, t_data *data)
 		return (-1);
 	}
 	data->prompt = parse_prompt(line, data->environ);
-	error = lexical_analyzer(data->prompt);
+	error = lexical_analyzer(&data->prompt);
 	free(line);
 	return (error);
 }
