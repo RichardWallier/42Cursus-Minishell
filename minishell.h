@@ -6,20 +6,30 @@
 /*   By: rwallier <rwallier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 18:52:16 by rwallier          #+#    #+#             */
-/*   Updated: 2023/06/07 18:11:24 by rwallier         ###   ########.fr       */
+/*   Updated: 2023/06/21 20:40:27 by rwallier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MINISHELL_H
 # define MINISHELL_H
 
-# include "./libft/libft.h"
-# include <stdio.h>
 # include <unistd.h>
+# include <stdint.h>
+# include <stdio.h>
 # include <stdlib.h>
-# include <readline/readline.h>
+# include <string.h>
+# include <locale.h>
+# include <signal.h>
+# include <errno.h>
+# include <fcntl.h>
+# include <sys/types.h>
+# include <sys/ioctl.h>
 # include <sys/wait.h>
-# include <limits.h>
+# include <termios.h>
+# include <readline/readline.h>
+# include <readline/history.h>
+# include "./libft/libft.h"
+
 
 typedef struct s_data {
 	t_word	*prompt;
@@ -64,6 +74,17 @@ enum e_token
 	MS_HEREDOC = 64,
 };
 
+enum e_builtins
+{
+	MS_ECHO = 256,
+	MS_CD = 512,
+	MS_PWD = 1024,
+	MS_EXPORT = 2048,
+	MS_UNSET = 4096,
+	MS_ENV = 8192,
+	MS_EXIT = 16384,
+};
+
 void	wrong_path(void);
 
 int		run_commands(char **cmds, char **env);
@@ -89,7 +110,5 @@ int		cd_builtin(char **path, t_data *data);
 int		export_builtin(char **cmd, t_data *data);
 
 int		unset_builtin(char **cmd, t_data *data);
-
-int		exit_builtin(t_data *data);
 
 #endif // !MINISHELL_H

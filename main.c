@@ -6,7 +6,7 @@
 /*   By: rwallier <rwallier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 18:52:01 by rwallier          #+#    #+#             */
-/*   Updated: 2023/06/07 18:12:00 by rwallier         ###   ########.fr       */
+/*   Updated: 2023/06/25 13:14:50 by rwallier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,19 @@ void	ms_lstadd_back(t_word **lst, t_word *new);
 t_word	*parse_prompt(char *line, t_list *env_lst);
 int	parser(char *line, t_data *data);
 int	is_meta_char(char *c);
+int	has_pipe(t_word *node);
+int	ms_pipe(t_word *node);
+void	close_pipe(int *fd);
+t_word	*clean_sentence_redirections(t_word **lst, int flag);
+void	exec_no_pipe(t_word *node, t_list **env_lst);
+int	exec_bin(t_word *node, t_list *env_lst);
+void	exec_builtin(t_word *node, t_list **env_lst, uint16_t builtin);
+char	*check_bin(char *cmd, t_list *env);
+void	free_matrix(char **mat);
+void	close_all_fd(t_word *node);
+char	**node_to_matrix(t_word *node);
+char	**env_to_matrix(t_list *node);
+
 
 int	main(void)
 {
@@ -36,7 +49,7 @@ int	main(void)
 		line = readline(data.bash);
 		free(data.bash);
 		if (!line)
-			exit_builtin(&data);
+			exit_builtin(&data.prompt, &data.environ);
 		if (!is_only_whitespaces(line))
 			add_history(line);
 		if (parser(&line, &data)) 
@@ -49,6 +62,473 @@ int	main(void)
 		ms_lstclear(&data.prompt, 1);//TODO
 	}
 	return (0);
+}
+
+int	ms_executor(t_word **lst, t_list **env_lst, int flag)
+{
+	t_word		*node;
+	t_word		**aux;
+
+	node = *lst;
+	ms_pipe(node);
+	while (node)
+	{
+		if (ms_do_redirections(node) != 0)
+			return (1);
+		if (!flag)
+			node = clean_sentence_redirections(lst, 1);
+		else
+			node = clean_sentence_redirections(aux, 0);
+		if (!has_pipe(*lst))
+			exec_no_pipe(node, env_lst); 
+		else
+			exec_pipe(node, env_lst); // TODO
+		ms_close_sentence_fd(node); // TODO
+		aux = ms_get_next_cmd_addr(node); // TODO
+		node = ms_get_next_command(node); // TODO
+		flag++;
+	}
+	return (0);
+}
+
+void	exec_no_pipe(t_word *node, t_list **env_lst)
+{
+	if (!is_builtin(node))
+		exec_bin(node, *env_lst);
+	else
+		exec_builtin(node, env_lst, is_builtin(node));
+}
+
+int	exec_bin(t_word *node, t_list *env_lst)
+{
+	char		*cmd;
+	char		**cmd_mat;
+	char		**env_mat;
+
+	if (!node)
+		return (0);
+	cmd = check_bin(node->word, env_lst);
+	if (!cmd)
+		return (-1);
+	node->pid = fork();
+	if (node->pid == 0)
+	{
+		signal(SIGQUIT, SIG_DFL);
+		if (node->fd_out != STDOUT_FILENO)
+			dup2(node->fd_out, STDOUT_FILENO);
+		if (node->fd_in != STDIN_FILENO)
+			dup2(node->fd_in, STDIN_FILENO);
+		close_all_fd(node->head);
+		cmd_mat = lst_to_matrix(node);
+		env_mat = env_to_matrix(node->env_lst);
+		execve(cmd, cmd_mat, env_mat);
+		return (0);
+	}
+	free(cmd);
+	return (0);
+}
+
+void	exec_builtin(t_word *node, t_list **env_lst, uint16_t builtin)
+{
+	if (builtin == MS_ECHO)
+		node->ret = ms_echo(node);
+	else if (builtin == MS_CD)
+		node->ret = ms_cd(node);
+	else if (builtin == MS_PWD)
+		node->ret = ms_pwd(node);
+	else if (builtin == MS_EXPORT)
+		node->ret = ms_export(node);
+	else if (builtin == MS_ENV)
+		node->ret = ms_env(node);
+	else if (builtin == MS_UNSET)
+		node->ret = ms_unset(node, env_lst);
+	else if (builtin == MS_EXIT)
+		exit_builtin(&node->head, &node->env_lst);
+	return ;
+}
+
+void	exit_builtin(t_word **word, t_list **env_lst)
+{
+	unsigned char	ret;
+
+	ret = exit_error_code(word);
+	ft_lstclear(env_lst, free);
+	ms_lstclear(word, 0);
+	rl_clear_history();
+	exit(ret);
+	return ;
+}
+
+static int	exit_error_code(t_word **lst)
+{
+	t_word				*node;
+
+	if (!lst || !*lst)
+		return (0);
+	node = *lst;
+	if (node->next && node->next->flag == MS_WORD
+		&& node->next->next && node->next->next->flag == MS_WORD)
+	{
+		ft_putstr_fd("Minishell: Exit: Too many args\n", STDERR_FILENO);
+		return (1);
+	}
+	else if (node->next && node->next->flag == MS_WORD)
+	{
+		if (str_is_num(node->next->word) == 0)
+			return (ft_atoi(node->next->word));
+		else
+		{
+			ft_putstr_fd("Minishell: Exit: Invalid number\n", STDERR_FILENO);
+			return (255);
+		}
+	}
+	return (0);
+}
+
+static int	str_is_num(char *str)
+{
+	if (!str || *str == '-')
+		return (2);
+	if (*str == '+')
+		str++;
+	if (!*str)
+		return (1);
+	while (*str)
+	{
+		if (!ft_isdigit(*str))
+			return (1);
+		str++;
+	}
+	return (0);
+}
+
+char	**env_to_matrix(t_list *node)
+{
+	char	**mat;
+	int		mat_size;
+	int		i;
+
+	mat_size = ft_lstsize(node);
+	if (!mat_size)
+		return (NULL);
+	mat = ft_calloc(mat_size + 1, sizeof(char *));
+	if (!mat)
+		return (NULL);
+	mat[mat_size] = NULL;
+	i = 0;
+	while (node)
+	{
+		mat[i] = ft_strdup(node->content, 0);
+		if (!mat[i])
+		{
+			ft_free_mat(mat);
+			return (NULL);
+		}
+		node = node->next;
+		i++;
+	}
+	return (mat);
+}
+
+char	**lst_to_matrix(t_word *node)
+{
+	t_word				*aux;
+	char				**mat;
+	unsigned int		mat_positions;
+	unsigned int		i;
+
+	if (!node)
+		return (NULL);
+	aux = node;
+	i = -1;
+	mat_positions = 0;
+	while (aux && aux->flag == MS_WORD)
+	{
+		aux = aux->next;
+		mat_positions++;
+	}
+	mat = ft_calloc(mat_positions + 1, sizeof(char *));
+	if (!mat)
+		return (NULL);
+	while (++i < mat_positions)
+	{
+		mat[i] = ft_strdup(node->word, 0);
+		node = node->next;
+	}
+	return (mat);
+}
+
+void	close_all_fd(t_word *node)
+{
+	while (node)
+	{
+		if (node->fd_in != STDIN_FILENO)
+			close(node->fd_in);
+		else if (node->fd_out != STDOUT_FILENO)
+			close(node->fd_out);
+		node = node->next;
+	}
+	return ;
+}
+
+char	*check_bin(char *cmd, t_list *env)
+{
+	if (!cmd)
+		return (NULL);
+	if (cmd[0] == '/')
+	{
+		if (access(cmd, F_OK | X_OK) == 0)
+			return (ft_strdup(cmd, 0));
+		else
+		{
+			return (ft_putstr_fd("Ms: cmd not found\n", STDERR_FILENO), NULL);
+		}
+	}
+	cmd = ft_strjoin("/", cmd, 0);
+	if (check_bin_current_dir(&cmd) == 0)
+		return (cmd);
+	else if (check_bin_path(&cmd, env) == 0)
+		return (cmd);
+	free(cmd);
+	return (NULL);
+}
+
+static int	check_bin_current_dir(char **cmd)
+{
+	char				*cmd_with_pwd;
+	extern unsigned int	g_exit_status;
+
+	cmd_with_pwd = ft_strjoin(getcwd(NULL, 0), *cmd, 1);
+	if (access(cmd_with_pwd, F_OK) == 0)
+	{
+		if (access(cmd_with_pwd, F_OK | X_OK) == 0)
+		{
+			free(*cmd);
+			*cmd = cmd_with_pwd;
+			return (0);
+		}
+		else
+		{
+			ft_putstr_fd("Ms: cmd access dennied\n", STDERR_FILENO);
+			g_exit_status = 126;
+		}
+	}
+	free(cmd_with_pwd);
+	return (1);
+}
+
+static int	check_bin_path(char **cmd, t_list *env)
+{
+	int					i;
+	char				**path;
+	char				*path_cmd;
+	extern unsigned int	g_exit_status;
+
+	if (!get_environment_node(env, "PATH"))
+	{
+		g_exit_status = 127;
+		return (ft_putstr_fd("Ms: PATH unseted\n", STDERR_FILENO), 1);
+	}
+	i = -1;
+	path = ft_split(get_environment_node(env, "PATH"), ':');
+	while (path[++i])
+	{
+		path_cmd = ft_strjoin(path[i], *cmd, 0);
+		if (access(path_cmd, F_OK | X_OK) == 0)
+		{
+			free_matrix(path);
+			free(*cmd);
+			return (*cmd = path_cmd, 0);
+		}
+		free(path_cmd);
+	}
+	ft_putstr_fd("Ms: Command not found\n", STDERR_FILENO);
+	return (free_matrix(path), g_exit_status = 127, 1);
+}
+
+void	free_matrix(char **mat)
+{
+	int	i;
+
+	i = 0;
+	if (!mat)
+		return ;
+	while (mat[i])
+	{
+		free(mat[i]);
+		i++;
+	}
+	free(mat);
+	return ;
+}
+
+int	is_builtin(t_word *node)
+{
+	if (!node)
+		return (0);
+	if (ft_strncmp(node->word, "echo", 5) == 0)
+		return (MS_ECHO);
+	else if (ft_strncmp(node->word, "cd", 3) == 0)
+		return (MS_CD);
+	else if (ft_strncmp(node->word, "pwd", 4) == 0)
+		return (MS_PWD);
+	else if (ft_strncmp(node->word, "export", 7) == 0)
+		return (MS_EXPORT);
+	else if (ft_strncmp(node->word, "unset", 6) == 0)
+		return (MS_UNSET);
+	else if (ft_strncmp(node->word, "exit", 5) == 0)
+		return (MS_EXIT);
+	else if (ft_strncmp(node->word, "env", 4) == 0)
+		return (MS_ENV);
+	return (0);
+}
+
+void	lst_remove_if(t_word **head)
+{
+	t_word	*node;
+
+	if (!head || !*head || (*head)->flag == MS_PIPE)
+		return ;
+	node = *head;
+	if (node->flag != MS_WORD)
+	{
+		*head = node->next;
+		free(node->word);
+		free(node);
+		lst_remove_if(head);
+	}
+	node = *head;
+	if (!head || !*head || (*head)->flag == MS_PIPE)
+		return ;
+	lst_remove_if(&node->next);
+	return ;
+}
+
+t_word	*clean_sentence_redirections(t_word **lst, int flag)
+{
+	t_word	*ref;
+	t_word	*aux;
+
+	ref = *lst;
+	lst_remove_if(lst);
+	if (flag && *lst && *lst != ref)
+	{
+		aux = *lst;
+		while (aux)
+		{
+			aux->head = *lst;
+			aux = aux->next;
+		}
+	}
+	return (*lst);
+}
+
+int	ms_heredoc(t_word *node)
+{
+	int		fd[2];
+	char	*line;
+
+	if (pipe(fd) == -1)
+		return (-1);
+	line = NULL;
+	while (42)
+	{
+		line = readline("> ");
+		if (!line || !ft_strncmp(node->next->word, line, ft_strlen(line) + 1))
+			break ;
+		else if (line)
+		{
+			write (fd[1], line, ft_strlen(line));
+			write (fd[1], "\n", 1);
+			free(line);
+		}
+	}
+	if (line)
+		free(line);
+	close (fd[1]);
+	return (fd[0]);
+}
+
+int	ms_redirect_in(t_word *node)
+{
+	t_word	*head;
+
+	head = node;
+	while (head && head->flag != MS_WORD)
+		head = head->next;
+	while (head && node && node->flag != MS_PIPE)
+	{
+		if (node->flag == MS_REDIRECT_IN)
+		{
+			if (!access(node->next->word, F_OK | R_OK))
+				head->fd_in = open(node->next->word, O_RDWR);
+			else
+			{
+				printf("Error: No such file as '%s'\n", node->next->word);
+				return (-1);
+			}
+		}
+		else if (node->flag == MS_HEREDOC)
+			head->fd_in = ms_heredoc(node);
+		node = node->next;
+	}
+	return (0);
+}
+
+int	ms_do_redirections(t_word *node)
+{
+	if (!node)
+		return (0);
+	if (ms_redirect_in(node) || ms_redirect_out(node))
+		return (-1);
+	return (0);
+}
+
+int	has_pipe(t_word *node)
+{
+	while (node)
+	{
+		if (node->flag == MS_PIPE)
+			return (0);
+		node = node->next;
+	}
+	return (1);
+}
+
+int	ms_pipe(t_word *node)
+{
+	int		fd[2];
+	t_word	*cmd;
+
+	while (node)
+	{
+		while (node && node->flag != MS_PIPE && node->flag != MS_WORD)
+			node = node->next;
+		cmd = node;
+		while (node && node->flag != MS_PIPE)
+			node = node->next;
+		if (!node)
+			return (0);
+		if (pipe(fd) == -1)
+			return (1);
+		cmd->fd_out = fd[1];
+		node = node->next;
+		cmd = node;
+		while (cmd && cmd->flag != MS_PIPE && cmd->flag != MS_WORD)
+			cmd = cmd->next;
+		if (cmd)
+			cmd->fd_in = fd[0];
+		else
+			close_pipe(fd);
+	}
+	return (0);
+}
+
+void	close_pipe(int *fd)
+{
+	close(fd[0]);
+	close(fd[1]);
+	return ;
 }
 
 int	get_flag_word(char *word, int last_flag)
