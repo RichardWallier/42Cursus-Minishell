@@ -6,7 +6,7 @@
 /*   By: rwallier <rwallier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 18:52:01 by rwallier          #+#    #+#             */
-/*   Updated: 2023/06/25 14:19:27 by rwallier         ###   ########.fr       */
+/*   Updated: 2023/06/25 15:31:05 by rwallier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,7 @@ void	free_matrix(char **mat);
 void	close_all_fd(t_word *node);
 char	**node_to_matrix(t_word *node);
 char	**env_to_matrix(t_list *node);
+void	exit_builtin(t_word **word, t_list **env_lst);
 
 
 int	main(void)
