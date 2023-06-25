@@ -6,7 +6,7 @@
 /*   By: wcaetano <wcaetano@student.42.rio>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 18:52:01 by rwallier          #+#    #+#             */
-/*   Updated: 2023/06/25 16:09:39 by wcaetano         ###   ########.fr       */
+/*   Updated: 2023/06/25 16:11:49 by wcaetano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -314,7 +314,7 @@ int	unset_builtin(t_word *node, t_list **env)
 	i = 1;
 	while (av[i])
 	{
-		ms_delete_env(env, av[i]);
+		delete_environment(env, av[i]);
 		i++;
 	}
 	if (*env != node->head->env_lst)
@@ -330,7 +330,7 @@ int	unset_builtin(t_word *node, t_list **env)
 	return (0);
 }
 
-void	ms_delete_env(t_list **node, char *ref)
+void	delete_environment(t_list **node, char *ref)
 {
 	char	*env_key;
 	t_list	*aux;
@@ -339,7 +339,7 @@ void	ms_delete_env(t_list **node, char *ref)
 		return ;
 	aux = *node;
 	env_key = ft_substr(aux->content, 0,
-			ft_strchr(aux->content, '=') - (unsigned long int)aux->content);
+			ft_strchr(aux->content, '=') - aux->content);
 	if (!ft_strncmp(ref, env_key, ft_strlen(env_key) + 1))
 	{
 		*node = aux->next;
@@ -349,7 +349,7 @@ void	ms_delete_env(t_list **node, char *ref)
 		return ;
 	}
 	else
-		ms_delete_env(&aux->next, ref);
+		delete_environment(&aux->next, ref);
 	free(env_key);
 	return ;
 }
@@ -395,7 +395,7 @@ int	export_builtin(t_word *node)
 	i = 1;
 	while (av[i])
 	{
-		ms_export_util(av[i], node);
+		export_util(av[i], node);
 		i++;
 	}
 	free(av[0]);
@@ -403,7 +403,7 @@ int	export_builtin(t_word *node)
 	return (0);
 }
 
-static void	ms_export_util(char *arg, t_word *node)
+void	export_util(char *arg, t_word *node)
 {
 	char	**env_node;
 	char	*env_name;
@@ -469,7 +469,7 @@ int	cd_builtin(t_word *node)
 	return (err);
 }
 
-static int	cd_with_params(t_word *node)
+int	cd_with_params(t_word *node)
 {
 	char	*pwd;
 
@@ -496,7 +496,7 @@ static int	cd_with_params(t_word *node)
 	return (0);
 }
 
-static int	cd_without_params(t_word *node)
+int	cd_without_params(t_word *node)
 {
 	char	*pwd;
 
@@ -571,7 +571,7 @@ int	exit_error_code(t_word **lst)
 	return (0);
 }
 
-static int	str_is_num(char *str)
+int	str_is_num(char *str)
 {
 	if (!str || *str == '-')
 		return (2);
@@ -679,7 +679,7 @@ char	*check_bin(char *cmd, t_list *env)
 	return (NULL);
 }
 
-static int	check_bin_current_dir(char **cmd)
+int	check_bin_current_dir(char **cmd)
 {
 	char				*cmd_with_pwd;
 	extern unsigned int	g_exit_status;
@@ -703,7 +703,7 @@ static int	check_bin_current_dir(char **cmd)
 	return (1);
 }
 
-static int	check_bin_path(char **cmd, t_list *env)
+int	check_bin_path(char **cmd, t_list *env)
 {
 	int					i;
 	char				**path;
@@ -1120,7 +1120,7 @@ char	*expand_environment(char *line, t_list *env)
 	return (ret_line);
 }
 
-static void	set_quote_with_null(char *line)
+void	set_quote_with_null(char *line)
 {
 	int	next_quotes;
 
@@ -1312,7 +1312,7 @@ int	parser(char *line, t_data *data)
 	return (error);
 }
 
-static void	set_head(t_word *head)
+void	set_head(t_word *head)
 {
 	t_word	*aux;
 
