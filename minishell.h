@@ -6,7 +6,7 @@
 /*   By: rwallier <rwallier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 18:52:16 by rwallier          #+#    #+#             */
-/*   Updated: 2023/06/25 16:09:36 by rwallier         ###   ########.fr       */
+/*   Updated: 2023/06/25 16:29:09 by rwallier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,15 +88,17 @@ int		exit_error_code(t_word **lst);
 
 void	exec_builtin_pipe(t_word *node, t_list **env_lst, uint16_t builtin);
 
-static int	check_bin_current_dir(char **cmd);
+int	check_bin_current_dir(char **cmd);
 
-static int	check_bin_path(char **cmd, t_list *env);
+int	check_bin_path(char **cmd, t_list *env);
 
-int	is_builtin(t_word *node);
+int		is_builtin(t_word *node);
+
+int	get_word_len(char *line);
 
 void	delete_environment(t_list **node, char *ref);
 char	*get_environment_node(t_list *env_node, char *env);
-int	update_environment(t_list *env_lst, char *ref, char *newvalue);
+int		update_environment(t_list *env_lst, char *ref, char *newvalue);
 
 // Ms lst functions
 

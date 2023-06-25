@@ -6,7 +6,7 @@
 /*   By: rwallier <rwallier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/03 16:34:25 by vsergio           #+#    #+#             */
-/*   Updated: 2023/06/07 17:44:55 by rwallier         ###   ########.fr       */
+/*   Updated: 2023/06/25 16:25:30 by rwallier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,8 @@ int		ft_isalnum(int a);
 int		ft_isascii(int c);
 
 int		ft_isprint(int c);
+
+int		ft_isspace(char c);
 
 size_t	ft_strlen(const char *str);
 

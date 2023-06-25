@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: wcaetano <wcaetano@student.42.rio>         +#+  +:+       +#+        */
+/*   By: rwallier <rwallier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 18:52:01 by rwallier          #+#    #+#             */
-/*   Updated: 2023/06/25 16:11:49 by wcaetano         ###   ########.fr       */
+/*   Updated: 2023/06/25 16:21:44 by rwallier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -856,6 +856,33 @@ int	ms_redirect_in(t_word *node)
 		}
 		else if (node->flag == MS_HEREDOC)
 			head->fd_in = ms_heredoc(node);
+		node = node->next;
+	}
+	return (0);
+}
+
+int	ms_redirect_out(t_word *node)
+{
+	t_word	*head;
+
+	head = node;
+	while (head && head->flag != MS_WORD)
+		head = head->next;
+	while (head && node && node->flag != MS_PIPE)
+	{
+		if (node->flag == MS_REDIRECT_OUT || node->flag == MS_APPEND)
+		{
+			if (head->fd_out != STDOUT_FILENO)
+				close(head->fd_out);
+			if (node->flag == MS_REDIRECT_OUT)
+				head->fd_out = open(node->next->word,
+						O_WRONLY | O_CREAT | O_TRUNC, 0777);
+			else
+				head->fd_out = open(node->next->word,
+						O_WRONLY | O_CREAT | O_APPEND, 0777);
+			if (head->fd_out == -1)
+				return (-1);
+		}
 		node = node->next;
 	}
 	return (0);
