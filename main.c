@@ -6,7 +6,7 @@
 /*   By: rwallier <rwallier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 18:52:01 by rwallier          #+#    #+#             */
-/*   Updated: 2023/06/25 15:31:05 by rwallier         ###   ########.fr       */
+/*   Updated: 2023/06/25 15:55:03 by rwallier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -167,20 +167,31 @@ void	exec_pipe(t_word *node, t_list **env_lst)
 void	exec_builtin_pipe(t_word *node, t_list **env_lst, uint16_t builtin)
 {
 	if (builtin == MS_ECHO)
-		exit(ms_echo(node));
+		exit(echo_builtin(node));
 	else if (builtin == MS_CD)
-		exit(ms_cd(node));
+		exit(cd_builtin(node));
 	else if (builtin == MS_PWD)
-		exit(ms_pwd(node));
+		exit(pwd_builtin(node));
 	else if (builtin == MS_EXPORT)
-		exit(ms_export(node));
+		exit(export_builtin(node));
 	else if (builtin == MS_ENV)
-		exit(ms_env(node));
+		exit(env_builtiin(node));
 	else if (builtin == MS_UNSET)
-		exit(ms_unset(node, env_lst));
+		exit(unset_builtin(node, env_lst));
 	else if (builtin == MS_EXIT)
-		exit(ms_exit_pipe(&node, &node->env_lst));
+		exit(exit_builtin_pipe(&node, &node->env_lst));
 	return ;
+}
+
+int	exit_builtin_pipe(t_word **word, t_list **env_lst)
+{
+	int	ret;
+
+	ret = exit_error_code(word);
+	ft_lstclear(env_lst, free);
+	ms_lstclear(word, 0);
+	rl_clear_history();
+	return (ret);
 }
 
 void	exec_bin_pipe(t_word *node, t_list *env_lst)
@@ -220,9 +231,9 @@ char	*check_bin(char *cmd, t_list *env)
 		}
 	}
 	cmd = ft_strjoin("/", cmd, 0);
-	if (ms_check_bin_current_dir(&cmd) == 0)
+	if (check_bin_current_dir(&cmd) == 0)
 		return (cmd);
-	else if (ms_check_bin_path(&cmd, env) == 0)
+	else if (check_bin_path(&cmd, env) == 0)
 		return (cmd);
 	free(cmd);
 	return (NULL);
@@ -268,23 +279,23 @@ int	exec_bin(t_word *node, t_list *env_lst)
 void	exec_builtin(t_word *node, t_list **env_lst, uint16_t builtin)
 {
 	if (builtin == MS_ECHO)
-		node->ret = ms_echo(node);
+		node->ret = echo_builtin(node);
 	else if (builtin == MS_CD)
-		node->ret = ms_cd(node);
+		node->ret = cd_builtin(node);
 	else if (builtin == MS_PWD)
-		node->ret = ms_pwd(node);
+		node->ret = pwd_builtin(node);
 	else if (builtin == MS_EXPORT)
-		node->ret = ms_export(node);
+		node->ret = export_builtin(node);
 	else if (builtin == MS_ENV)
-		node->ret = ms_env(node);
+		node->ret = env_builtiin(node);
 	else if (builtin == MS_UNSET)
-		node->ret = ms_unset(node, env_lst);
+		node->ret = unset_builtin(node, env_lst);
 	else if (builtin == MS_EXIT)
 		exit_builtin(&node->head, &node->env_lst);
 	return ;
 }
 
-int	ms_unset(t_word *node, t_list **env)
+int	unset_builtin(t_word *node, t_list **env)
 {
 	t_word	*aux;
 	char	**av;
@@ -336,7 +347,7 @@ void	ms_delete_env(t_list **node, char *ref)
 	return ;
 }
 
-int	ms_env(t_word *node)
+int	env_builtiin(t_word *node)
 {
 	t_list	*env;
 
@@ -353,7 +364,7 @@ int	ms_env(t_word *node)
 	return (0);
 }
 
-int	ms_pwd(t_word *node)
+int	pwd_builtin(t_word *node)
 {
 	char	*cwd;
 
@@ -366,7 +377,7 @@ int	ms_pwd(t_word *node)
 	return (0);
 }
 
-int	ms_export(t_word *node)
+int	export_builtin(t_word *node)
 {
 	char	**av;
 	int		i;
@@ -407,7 +418,7 @@ static void	ms_export_util(char *arg, t_word *node)
 		free(arg);
 }
 
-int	ms_echo(t_word *node)
+int	echo_builtin(t_word *node)
 {
 	uint8_t	newline;
 	t_word	*head;
@@ -435,7 +446,7 @@ int	ms_echo(t_word *node)
 	return (0);
 }
 
-int	ms_cd(t_word *node)
+int	cd_builtin(t_word *node)
 {
 	uint8_t	err;
 
@@ -527,7 +538,7 @@ void	exit_builtin(t_word **word, t_list **env_lst)
 	return ;
 }
 
-static int	exit_error_code(t_word **lst)
+int	exit_error_code(t_word **lst)
 {
 	t_word				*node;
 

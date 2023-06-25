@@ -6,7 +6,7 @@
 /*   By: rwallier <rwallier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 18:52:16 by rwallier          #+#    #+#             */
-/*   Updated: 2023/06/25 15:28:21 by rwallier         ###   ########.fr       */
+/*   Updated: 2023/06/25 15:55:58 by rwallier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,30 +84,38 @@ enum e_builtins
 	MS_EXIT = 16384,
 };
 
-void	wrong_path(void);
+int		exit_error_code(t_word **lst);
 
-int		run_commands(char **cmds, char **env);
+void	exec_builtin_pipe(t_word *node, t_list **env_lst, uint16_t builtin);
 
-int		matriz_len(char **matriz);
+static int	check_bin_current_dir(char **cmd);
 
-char	*ft_substr_free(char *str, unsigned int start, size_t len);
+static int	check_bin_path(char **cmd, t_list *env);
 
-char	*ft_strjoin_free(char *s1, char const *s2);
+int	is_builtin(t_word *node);
 
-int		free_split(char **split);
+// Ms lst functions
 
-int		parse_env(t_data *data, char **environ);
+void	ms_lstclear(t_word **lst, int flag);
 
-int		is_only_whitespaces(char *str);
+char	**lst_to_matrix(t_word *node);
 
 // Built in commands
 
-int		env_builtin(t_data *data);
+int		echo_builtin(t_word *node);
 
-int		cd_builtin(char **path, t_data *data);
+int		cd_builtin(t_word *node);
 
-int		export_builtin(char **cmd, t_data *data);
+int		pwd_builtin(t_word *node);
 
-int		unset_builtin(char **cmd, t_data *data);
+int		export_builtin(t_word *node);
+
+int		env_builtiin(t_word *node);
+
+int		unset_builtin(t_word *node, t_list **env);
+
+void	exit_builtin(t_word **word, t_list **env_lst);
+
+int		exit_builtin_pipe(t_word **word, t_list **env_lst);
 
 #endif // !MINISHELL_H
