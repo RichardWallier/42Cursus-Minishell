@@ -6,7 +6,7 @@
 /*   By: rwallier <rwallier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 18:52:16 by rwallier          #+#    #+#             */
-/*   Updated: 2023/06/25 16:39:05 by rwallier         ###   ########.fr       */
+/*   Updated: 2023/06/25 16:59:47 by rwallier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,6 +99,8 @@ int	get_word_len(char *line);
 void	delete_environment(t_list **node, char *ref);
 char	*get_environment_node(t_list *env_node, char *env);
 int		update_environment(t_list *env_lst, char *ref, char *newvalue);
+int		parse_environment(t_data *data, char **environ);
+char	**get_environment_lst(t_list *env_node, char *env);
 
 // Ms lst functions
 

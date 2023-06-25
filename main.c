@@ -6,7 +6,7 @@
 /*   By: rwallier <rwallier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 18:52:01 by rwallier          #+#    #+#             */
-/*   Updated: 2023/06/25 16:46:21 by rwallier         ###   ########.fr       */
+/*   Updated: 2023/06/25 17:08:37 by rwallier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,7 @@ int	main(void)
 	extern char	**environ;
 
 	data.pwd = getcwd(NULL, 0);
-	parse_env(&data, environ);
+	parse_environment(&data, environ);
 
 	while (42)
 	{
@@ -62,19 +62,35 @@ int	main(void)
 		free(data.bash);
 		if (!line)
 			exit_builtin(&data.prompt, &data.environ);
-		if (!is_only_whitespaces(line))
+		if (line[0])
 			add_history(line);
 		if (parser(line, &data)) 
 		{
 			ms_lstclear(&data.prompt, 1);
 			continue ;	
 		}
-		executor
-	(&data.prompt, &data.environ, 0);
+		executor(&data.prompt, &data.environ, 0);
 		wait_cmds(data.prompt);
 		ms_lstclear(&data.prompt, 1);
 	}
 	return (0);
+}
+
+int	parse_env(t_data *data, char **environ)
+{
+	int	index;
+	t_list	*temp;
+
+	data->environ = ft_lstnew(ft_substr(environ[0], 0, ft_strlen(environ[0])));
+	index = 1;
+	while (environ[index])
+	{
+		temp = ft_lstnew(ft_substr(environ[index], 0, ft_strlen(environ[index])));
+		ft_lstadd_back(&data->environ, temp);
+		index++;
+	}
+	index = 0;
+	return (1);
 }
 
 void	wait_cmds(t_word *node)
@@ -224,7 +240,7 @@ void	exec_bin_pipe(t_word *node, t_list *env_lst)
 		dup2(node->fd_in, STDIN_FILENO);
 	close_all_fd(node->head);
 	mat = node_to_matrix(node);
-	env_mat = lst_to_matrix(node->env_lst);
+	env_mat = ft_lsttochrmat(node->env_lst);
 	execve(cmd, mat, env_mat);
 	return ;
 }
@@ -416,7 +432,7 @@ void	export_util(char *arg, t_word *node)
 	if (arg[0] != '=' && ft_strchr(arg, '='))
 	{
 		env_name = ft_substr(arg, 0, ft_strchr(arg, '=') - arg);
-		env_node = get_environment_node(node->env_lst, env_name);
+		env_node = get_environment_lst(node->env_lst, env_name);
 		if (env_node)
 		{
 			free(*env_node);
@@ -428,6 +444,32 @@ void	export_util(char *arg, t_word *node)
 	}
 	else
 		free(arg);
+}
+
+char	**get_environment_lst(t_list *env_node, char *env)
+{
+	char	*env_key;
+	char	*env_line;
+	char	**env_line_ptr;
+
+	env_line_ptr = NULL;
+	if (!env_node || !env)
+		return (NULL);
+	while (env_node)
+	{
+		env_line = env_node->content;
+		env_key = ft_substr(env_node->content,
+				0, ft_strchr(env_line, '=') - env_line);
+		if (!ft_strncmp(env_key, env, ft_strlen(env_key) + 1))
+		{
+			env_line_ptr = (char **)&env_node->content;
+			free(env_key);
+			break ;
+		}
+		free(env_key);
+		env_node = env_node->next;
+	}
+	return (env_line_ptr);
 }
 
 int	echo_builtin(t_word *node)
