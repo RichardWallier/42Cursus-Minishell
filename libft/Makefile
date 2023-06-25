@@ -5,7 +5,7 @@ SOURCES	+=	libc/ft_memmove.c libc/ft_memset.c extrafunctions/ft_putchar_fd.c
 SOURCES	+=	libc/ft_strlcpy.c libc/ft_strlen.c libc/ft_strncmp.c
 SOURCES	+=	libc/ft_strnstr.c libc/ft_strrchr.c libc/ft_substr.c
 SOURCES	+=	libc/ft_tolower.c libc/ft_toupper.c libc/ft_strlcat.c libc/ft_strchr.c
-SOURCES	+=	libc/ft_strcmp.c
+SOURCES	+=	libc/ft_strcmp.c libc/ft_isspace.c libc/ft_free_matrix.c
 
 SOURCES	+=	extrafunctions/ft_putendl_fd.c extrafunctions/ft_putnbr_fd.c
 SOURCES	+=	extrafunctions/ft_putstr_fd.c extrafunctions/ft_split.c
@@ -30,6 +30,7 @@ BONUS_SOURCES	+=	extrafunctions/ft_lstsize.c extrafunctions/ft_lstclear.c
 BONUS_SOURCES	+=	extrafunctions/ft_lstadd_back.c extrafunctions/ft_lstdelone.c
 BONUS_SOURCES	+=	extrafunctions/ft_lstmap.c extrafunctions/ft_lstiter.c 
 BONUS_SOURCES	+=	extrafunctions/ft_lstdelif.c extrafunctions/ft_lstlast.c
+BONUS_SOURCES	+=	extrafunctions/ft_lsttochrmat.c
 
 BONUS_OBJECTS	=	$(BONUS_SOURCES:.c=.o)
 

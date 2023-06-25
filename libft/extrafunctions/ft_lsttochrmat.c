@@ -19,7 +19,7 @@ char	**ft_lsttochrmat(t_list *node)
 		mat[i] = ft_strdup(node->content, 0);
 		if (!mat[i])
 		{
-			ft_free_mat(mat);
+			ft_free_matrix(mat);
 			return (NULL);
 		}
 		node = node->next;

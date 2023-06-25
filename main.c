@@ -6,7 +6,7 @@
 /*   By: rwallier <rwallier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 18:52:01 by rwallier          #+#    #+#             */
-/*   Updated: 2023/06/25 17:08:37 by rwallier         ###   ########.fr       */
+/*   Updated: 2023/06/25 17:33:42 by rwallier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,6 @@ void	exec_no_pipe(t_word *node, t_list **env_lst);
 int		exec_bin(t_word *node, t_list *env_lst);
 void	exec_builtin(t_word *node, t_list **env_lst, uint16_t builtin);
 char	*check_bin(char *cmd, t_list *env);
-void	free_matrix(char **mat);
 void	close_all_fd(t_word *node);
 char	**node_to_matrix(t_word *node);
 char	**env_to_matrix(t_list *node);
@@ -44,6 +43,7 @@ void	exec_bin_pipe(t_word *node, t_list *env_lst);
 t_word	*ms_get_next_command(t_word *node);
 t_word	**ms_get_next_cmd_addr(t_word *node);
 
+unsigned int	g_exit_status;
 
 int	main(void)
 {
@@ -76,7 +76,7 @@ int	main(void)
 	return (0);
 }
 
-int	parse_env(t_data *data, char **environ)
+int	parse_environment(t_data *data, char **environ)
 {
 	int	index;
 	t_list	*temp;
@@ -295,7 +295,7 @@ int	exec_bin(t_word *node, t_list *env_lst)
 		if (node->fd_in != STDIN_FILENO)
 			dup2(node->fd_in, STDIN_FILENO);
 		close_all_fd(node->head);
-		cmd_mat = lst_to_matrix(node);
+		cmd_mat = node_to_matrix(node);
 		env_mat = env_to_matrix(node->env_lst);
 		execve(cmd, cmd_mat, env_mat);
 		return (0);
@@ -329,7 +329,7 @@ int	unset_builtin(t_word *node, t_list **env)
 	char	**av;
 	int		i;
 
-	av = lst_to_matrix(node);
+	av = node_to_matrix(node);
 	if (!av)
 		return (-1);
 	i = 1;
@@ -347,7 +347,7 @@ int	unset_builtin(t_word *node, t_list **env)
 			aux = aux->next;
 		}
 	}
-	free_matrix(av);
+	ft_free_matrix(av);
 	return (0);
 }
 
@@ -410,7 +410,7 @@ int	export_builtin(t_word *node)
 	char	**av;
 	int		i;
 
-	av = lst_to_matrix(node);
+	av = node_to_matrix(node);
 	if (!av)
 		return (-1);
 	i = 1;
@@ -502,6 +502,7 @@ int	echo_builtin(t_word *node)
 
 int	cd_builtin(t_word *node)
 {
+	write(1, "cd builtin no pipe\n", 20);
 	uint8_t	err;
 
 	if (node->next && node->next->next && node->next->next->flag != MS_WORD)
@@ -518,12 +519,15 @@ int	cd_builtin(t_word *node)
 
 int	cd_with_params(t_word *node)
 {
+	write(1, "with params\n", 13);
 	char	*pwd;
 
 	if (node && node->next && node->next->flag == MS_WORD
 		&& node->next->next && node->next->next->flag == MS_WORD)
 		return (ft_putstr_fd("Ms: cd: too many arguments\n", STDERR_FILENO), 1);
 	pwd = getcwd(NULL, 0);
+	printf("WORD: %s\n", node->next->word);
+	chdir(node->next->word);
 	if (chdir(node->next->word) == -1)
 	{
 		ft_putstr_fd("Ms: cd: no such file or dir\n", STDERR_FILENO);
@@ -545,6 +549,7 @@ int	cd_with_params(t_word *node)
 
 int	cd_without_params(t_word *node)
 {
+	write(1, "without params\n", 16);
 	char	*pwd;
 
 	pwd = getcwd(NULL, 0);
@@ -654,7 +659,7 @@ char	**env_to_matrix(t_list *node)
 		mat[i] = ft_strdup(node->content, 0);
 		if (!mat[i])
 		{
-			free_matrix(mat);
+			ft_free_matrix(mat);
 			return (NULL);
 		}
 		node = node->next;
@@ -663,7 +668,7 @@ char	**env_to_matrix(t_list *node)
 	return (mat);
 }
 
-char	**lst_to_matrix(t_word *node)
+char	**node_to_matrix(t_word *node)
 {
 	t_word				*aux;
 	char				**mat;
@@ -747,30 +752,14 @@ int	check_bin_path(char **cmd, t_list *env)
 		path_cmd = ft_strjoin(path[i], *cmd, 0);
 		if (access(path_cmd, F_OK | X_OK) == 0)
 		{
-			free_matrix(path);
+			ft_free_matrix(path);
 			free(*cmd);
 			return (*cmd = path_cmd, 0);
 		}
 		free(path_cmd);
 	}
 	ft_putstr_fd("Ms: Command not found\n", STDERR_FILENO);
-	return (free_matrix(path), g_exit_status = 127, 1);
-}
-
-void	free_matrix(char **mat)
-{
-	int	i;
-
-	i = 0;
-	if (!mat)
-		return ;
-	while (mat[i])
-	{
-		free(mat[i]);
-		i++;
-	}
-	free(mat);
-	return ;
+	return (ft_free_matrix(path), g_exit_status = 127, 1);
 }
 
 int	is_builtin(t_word *node)

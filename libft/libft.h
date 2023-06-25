@@ -6,7 +6,7 @@
 /*   By: rwallier <rwallier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/03 16:34:25 by vsergio           #+#    #+#             */
-/*   Updated: 2023/06/25 17:04:52 by rwallier         ###   ########.fr       */
+/*   Updated: 2023/06/25 17:20:39 by rwallier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,6 +77,8 @@ void	*ft_calloc(size_t count, size_t size);
 char	*ft_substr(char const *str, unsigned int start, size_t len);
 
 char	*ft_strjoin(char *s1, char *s2, int flag);
+
+void	ft_free_matrix(char **mat);
 
 void	ft_putchar_fd(char c, int fd);
 

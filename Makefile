@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: wcaetano <wcaetano@student.42.rio>         +#+  +:+       +#+         #
+#    By: rwallier <rwallier@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/02/12 18:52:08 by rwallier          #+#    #+#              #
-#    Updated: 2023/06/25 16:24:47 by wcaetano         ###   ########.fr        #
+#    Updated: 2023/06/25 17:14:35 by rwallier         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -37,7 +37,7 @@ $(LIBFT):
 	@$(MAKE) $(LIBFTPATH) bonus
 
 $(NAME):	$(SOURCE) $(LIBFT)
-	@$(CC) $(CFLAGS) $(SOURCE) $(LIBFT) -o $(NAME) $(LIBFILES) 
+	@$(CC) $(CFLAGS) $(LIBFILES) $(SOURCE) $(LIBFT) -o $(NAME) #Mac M1
 	@echo 'Minishell compiled'
 
 clean:
