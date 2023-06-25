@@ -6,7 +6,7 @@
 /*   By: rwallier <rwallier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 18:52:16 by rwallier          #+#    #+#             */
-/*   Updated: 2023/06/21 20:40:27 by rwallier         ###   ########.fr       */
+/*   Updated: 2023/06/25 15:28:21 by rwallier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,19 +31,6 @@
 # include "./libft/libft.h"
 
 
-typedef struct s_data {
-	t_word	*prompt;
-	char	*bash;
-	char	*pwd;
-	t_list	*environ;
-}				t_data;
-
-typedef struct s_linked_list {
-	void*					content;
-	int						flag;
-	struct s_linked_list	*next;
-}				t_linked_list;
-
 typedef struct s_word
 {
 	char			*word;
@@ -56,6 +43,18 @@ typedef struct s_word
 	struct s_list	*env_lst;
 	struct s_word	*next;
 }	t_word;
+typedef struct s_data {
+	t_word	*prompt;
+	char	*bash;
+	char	*pwd;
+	t_list	*environ;
+}				t_data;
+
+typedef struct s_linked_list {
+	void*					content;
+	int						flag;
+	struct s_linked_list	*next;
+}				t_linked_list;
 
 typedef struct s_pos
 {
