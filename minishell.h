@@ -6,7 +6,7 @@
 /*   By: rwallier <rwallier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 18:52:16 by rwallier          #+#    #+#             */
-/*   Updated: 2023/06/25 16:29:09 by rwallier         ###   ########.fr       */
+/*   Updated: 2023/06/25 16:39:05 by rwallier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,6 +103,10 @@ int		update_environment(t_list *env_lst, char *ref, char *newvalue);
 // Ms lst functions
 
 void	ms_lstclear(t_word **lst, int flag);
+
+void	lst_remove_empty_word(t_word **head);
+
+void	ms_lst_remove_if(t_word **head);
 
 char	**lst_to_matrix(t_word *node);
 
