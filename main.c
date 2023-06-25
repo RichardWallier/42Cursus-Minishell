@@ -6,7 +6,7 @@
 /*   By: rwallier <rwallier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 18:52:01 by rwallier          #+#    #+#             */
-/*   Updated: 2023/06/25 13:14:50 by rwallier         ###   ########.fr       */
+/*   Updated: 2023/06/25 14:19:27 by rwallier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,11 +57,35 @@ int	main(void)
 			ms_lstclear(&data.prompt, 1);
 			continue ;	
 		}
-		ms_executor(&data.prompt, &data.environ, 0);// TODO
-		ms_wait_cmds(data.prompt);//TODO
-		ms_lstclear(&data.prompt, 1);//TODO
+		ms_executor(&data.prompt, &data.environ, 0);
+		ms_wait_cmds(data.prompt);
+		ms_lstclear(&data.prompt, 1);
 	}
 	return (0);
+}
+
+void	ms_wait_cmds(t_word *node)
+{
+	t_word				*aux;
+	extern unsigned int	g_exit_status;
+
+	if (!node)
+		return ;
+	aux = node;
+	while (node)
+	{
+		if (node->pid != 0)
+			waitpid(node->pid, &node->ret, 0);
+		node = node->next;
+	}
+	node = aux;
+	while (node)
+	{
+		if (node->ret >= 0)
+			g_exit_status = WEXITSTATUS(node->ret);
+		node = node->next;
+	}
+	return ;
 }
 
 int	ms_executor(t_word **lst, t_list **env_lst, int flag)
@@ -82,13 +106,125 @@ int	ms_executor(t_word **lst, t_list **env_lst, int flag)
 		if (!has_pipe(*lst))
 			exec_no_pipe(node, env_lst); 
 		else
-			exec_pipe(node, env_lst); // TODO
-		ms_close_sentence_fd(node); // TODO
-		aux = ms_get_next_cmd_addr(node); // TODO
-		node = ms_get_next_command(node); // TODO
+			exec_pipe(node, env_lst);
+		ms_close_sentence_fd(node);
+		aux = ms_get_next_cmd_addr(node);
+		node = ms_get_next_command(node);
 		flag++;
 	}
 	return (0);
+}
+
+t_word	*ms_get_next_command(t_word *node)
+{
+	while (node)
+	{
+		if (node->flag == MS_PIPE)
+			return (node->next);
+		node = node->next;
+	}
+	return (node);
+}
+
+t_word	**ms_get_next_cmd_addr(t_word *node)
+{
+	while (node && node->flag != MS_PIPE)
+		node = node->next;
+	if (node)
+		return (&node->next);
+	else
+		return (NULL);
+}
+
+void	ms_close_sentence_fd(t_word *node)
+{
+	while (node && node->flag != MS_PIPE)
+	{
+		if (node->fd_in != STDIN_FILENO)
+			close(node->fd_in);
+		if (node->fd_out != STDOUT_FILENO)
+			close(node->fd_out);
+		node = node->next;
+	}
+	return ;
+}
+
+void	exec_pipe(t_word *node, t_list **env_lst)
+{
+	uint16_t	builtin;
+
+	builtin = is_builtin(node);
+	node->pid = fork();
+	if (node->pid != 0)
+		return ;
+	if (!builtin)
+		exec_bin_pipe(node, *env_lst);
+	else
+		exec_builtin_pipe(node, env_lst, builtin);
+}
+
+void	exec_builtin_pipe(t_word *node, t_list **env_lst, uint16_t builtin)
+{
+	if (builtin == MS_ECHO)
+		exit(ms_echo(node));
+	else if (builtin == MS_CD)
+		exit(ms_cd(node));
+	else if (builtin == MS_PWD)
+		exit(ms_pwd(node));
+	else if (builtin == MS_EXPORT)
+		exit(ms_export(node));
+	else if (builtin == MS_ENV)
+		exit(ms_env(node));
+	else if (builtin == MS_UNSET)
+		exit(ms_unset(node, env_lst));
+	else if (builtin == MS_EXIT)
+		exit(ms_exit_pipe(&node, &node->env_lst));
+	return ;
+}
+
+void	exec_bin_pipe(t_word *node, t_list *env_lst)
+{
+	char		*cmd;
+	char		**mat;
+	char		**env_mat;
+
+	if (!node)
+		return ;
+	cmd = check_bin(node->word, env_lst);
+	if (!cmd)
+		exit(127);
+	signal(SIGQUIT, SIG_DFL);
+	if (node->fd_out != STDOUT_FILENO)
+		dup2(node->fd_out, STDOUT_FILENO);
+	if (node->fd_in != STDIN_FILENO)
+		dup2(node->fd_in, STDIN_FILENO);
+	close_all_fd(node->head);
+	mat = node_to_matrix(node);
+	env_mat = lst_to_matrix(node->env_lst);
+	execve(cmd, mat, env_mat);
+	return ;
+}
+
+char	*check_bin(char *cmd, t_list *env)
+{
+	if (!cmd)
+		return (NULL);
+	if (cmd[0] == '/')
+	{
+		if (access(cmd, F_OK | X_OK) == 0)
+			return (ft_strdup(cmd, 0));
+		else
+		{
+			return (ft_putstr_fd("Ms: cmd not found\n", STDERR_FILENO), NULL);
+		}
+	}
+	cmd = ft_strjoin("/", cmd, 0);
+	if (ms_check_bin_current_dir(&cmd) == 0)
+		return (cmd);
+	else if (ms_check_bin_path(&cmd, env) == 0)
+		return (cmd);
+	free(cmd);
+	return (NULL);
 }
 
 void	exec_no_pipe(t_word *node, t_list **env_lst)
@@ -145,6 +281,237 @@ void	exec_builtin(t_word *node, t_list **env_lst, uint16_t builtin)
 	else if (builtin == MS_EXIT)
 		exit_builtin(&node->head, &node->env_lst);
 	return ;
+}
+
+int	ms_unset(t_word *node, t_list **env)
+{
+	t_word	*aux;
+	char	**av;
+	int		i;
+
+	av = lst_to_matrix(node);
+	if (!av)
+		return (-1);
+	i = 1;
+	while (av[i])
+	{
+		ms_delete_env(env, av[i]);
+		i++;
+	}
+	if (*env != node->head->env_lst)
+	{
+		aux = node->head;
+		while (aux)
+		{
+			aux->env_lst = *env;
+			aux = aux->next;
+		}
+	}
+	free_matrix(av);
+	return (0);
+}
+
+void	ms_delete_env(t_list **node, char *ref)
+{
+	char	*env_key;
+	t_list	*aux;
+
+	if (!node || !*node)
+		return ;
+	aux = *node;
+	env_key = ft_substr(aux->content, 0,
+			ft_strchr(aux->content, '=') - (unsigned long int)aux->content);
+	if (!ft_strncmp(ref, env_key, ft_strlen(env_key) + 1))
+	{
+		*node = aux->next;
+		free(aux->content);
+		free(aux);
+		free(env_key);
+		return ;
+	}
+	else
+		ms_delete_env(&aux->next, ref);
+	free(env_key);
+	return ;
+}
+
+int	ms_env(t_word *node)
+{
+	t_list	*env;
+
+	if (node)
+		env = node->env_lst;
+	else
+		env = NULL;
+	while (env)
+	{
+		ft_putstr_fd(env->content, node->fd_out);
+		ft_putchar_fd('\n', node->fd_out);
+		env = env->next;
+	}
+	return (0);
+}
+
+int	ms_pwd(t_word *node)
+{
+	char	*cwd;
+
+	cwd = getcwd(NULL, 0);
+	if (!cwd)
+		return (1);
+	ft_putstr_fd(cwd, node->fd_out);
+	ft_putchar_fd('\n', node->fd_out);
+	free(cwd);
+	return (0);
+}
+
+int	ms_export(t_word *node)
+{
+	char	**av;
+	int		i;
+
+	av = lst_to_matrix(node);
+	if (!av)
+		return (-1);
+	i = 1;
+	while (av[i])
+	{
+		ms_export_util(av[i], node);
+		i++;
+	}
+	free(av[0]);
+	free(av);
+	return (0);
+}
+
+static void	ms_export_util(char *arg, t_word *node)
+{
+	char	**env_node;
+	char	*env_name;
+
+	if (arg[0] != '=' && ft_strchr(arg, '='))
+	{
+		env_name = ft_substr(arg, 0, ft_strchr(arg, '=') - arg);
+		env_node = get_environment_node(node->env_lst, env_name);
+		if (env_node)
+		{
+			free(*env_node);
+			*env_node = arg;
+		}
+		else
+			ft_lstadd_back(&node->env_lst, ft_lstnew(arg));
+		free(env_name);
+	}
+	else
+		free(arg);
+}
+
+int	ms_echo(t_word *node)
+{
+	uint8_t	newline;
+	t_word	*head;
+
+	head = node;
+	newline = 1;
+	if (node->next)
+	{
+		if (!ft_strncmp(node->next->word, "-n", 2))
+		{
+			newline = 0;
+			node = node->next;
+		}
+		node = node->next;
+		while (node && node->flag != MS_PIPE)
+		{
+			ft_putstr_fd(node->word, head->fd_out);
+			node = node->next;
+			if (node && node->flag != MS_PIPE)
+				ft_putchar_fd(' ', head->fd_out);
+		}
+	}
+	if (newline)
+		ft_putchar_fd('\n', head->fd_out);
+	return (0);
+}
+
+int	ms_cd(t_word *node)
+{
+	uint8_t	err;
+
+	if (node->next && node->next->next && node->next->next->flag != MS_WORD)
+	{
+		ft_putstr_fd("minishell: cd: Too many arguments\n", node->fd_out);
+		return (1);
+	}
+	if (node->next && node->next->flag == MS_WORD)
+		err = cd_with_params(node);
+	else
+		err = cd_without_params(node);
+	return (err);
+}
+
+static int	cd_with_params(t_word *node)
+{
+	char	*pwd;
+
+	if (node && node->next && node->next->flag == MS_WORD
+		&& node->next->next && node->next->next->flag == MS_WORD)
+		return (ft_putstr_fd("Ms: cd: too many arguments\n", STDERR_FILENO), 1);
+	pwd = getcwd(NULL, 0);
+	if (chdir(node->next->word) == -1)
+	{
+		ft_putstr_fd("Ms: cd: no such file or dir\n", STDERR_FILENO);
+		free(pwd);
+		return (1);
+	}
+	if (update_environment(node->env_lst, "OLDPWD=", pwd) != 0)
+	{
+		free(pwd);
+		return (1);
+	}
+	free(pwd);
+	pwd = getcwd(NULL, 0);
+	if (update_environment(node->env_lst, "PWD=", pwd) != 0)
+		return (1);
+	free(pwd);
+	return (0);
+}
+
+static int	cd_without_params(t_word *node)
+{
+	char	*pwd;
+
+	pwd = getcwd(NULL, 0);
+	if (chdir(get_environment_node(node->env_lst, "HOME")) == -1)
+	{
+		ft_putstr_fd("minishell: cd: no such file or dir\n", node->fd_out);
+		free(pwd);
+		return (1);
+	}
+	if (update_environment(node->env_lst, "OLDPWD=", pwd) != 0)
+		return (1);
+	free(pwd);
+	pwd = getcwd(NULL, 0);
+	if (update_environment(node->env_lst, "PWD=", pwd) != 0)
+		return (1);
+	free(pwd);
+	return (0);
+}
+
+int	update_environment(t_list *env_lst, char *ref, char *newvalue)
+{
+	while (env_lst)
+	{
+		if (ft_strncmp(ref, env_lst->content, ft_strlen(ref)) == 0)
+		{
+			free(env_lst->content);
+			env_lst->content = ft_strjoin(ref, newvalue, 0);
+			if (!env_lst->content)
+				return (1);
+		}
+		env_lst = env_lst->next;
+	}
+	return (0);
 }
 
 void	exit_builtin(t_word **word, t_list **env_lst)
