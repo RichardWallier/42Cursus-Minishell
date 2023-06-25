@@ -6,7 +6,7 @@
 /*   By: wcaetano <wcaetano@student.42.rio>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 18:52:01 by rwallier          #+#    #+#             */
-/*   Updated: 2023/06/25 16:31:20 by wcaetano         ###   ########.fr       */
+/*   Updated: 2023/06/25 16:41:40 by wcaetano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -940,8 +940,8 @@ int	get_flag_word(char *word, int last_flag)
 	else if (ft_strncmp(word, "<", 2) == 0)
 		return (MS_REDIRECT_IN);
 	else if (ft_strncmp(word, ">", 2) == 0)
-		return (redirect_out);
-	else if (last_flag == redirect_out || last_flag == MS_REDIRECT_IN
+		return (MS_REDIRECT_OUT);
+	else if (last_flag == MS_REDIRECT_OUT  || last_flag == MS_REDIRECT_IN
 		|| last_flag == MS_HEREDOC || last_flag == MS_APPEND)
 		return (MS_REDIRECT_FILE);
 	return (MS_WORD);
@@ -1236,7 +1236,7 @@ int	analyze_redirect_syntax(t_word *word_lst)
 	node = word_lst;
 	while (node)
 	{
-		if (node->flag == MS_REDIRECT_IN || node->flag == redirect_out
+		if (node->flag == MS_REDIRECT_IN || node->flag == MS_REDIRECT_OUT
 			|| node->flag == MS_HEREDOC || node->flag == MS_APPEND)
 		{
 			if (!node->next || node->next->flag != MS_REDIRECT_FILE)
