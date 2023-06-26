@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rwallier <rwallier@student.42.fr>          +#+  +:+       +#+        */
+/*   By: wcaetano <wcaetano@student.42.rio>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 18:52:01 by rwallier          #+#    #+#             */
-/*   Updated: 2023/06/26 18:11:08 by rwallier         ###   ########.fr       */
+/*   Updated: 2023/06/26 18:13:57 by wcaetano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,11 +74,6 @@ int	main(void)
 		ms_lstclear(&data.prompt, 1);
 	}
 	return (0);
-}
-
-void update_prompt(t_data *data)
-{
-
 }
 
 void	ms_set_sighandle(void)
