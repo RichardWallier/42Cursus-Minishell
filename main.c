@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: wcaetano <wcaetano@student.42.rio>         +#+  +:+       +#+        */
+/*   By: rwallier <rwallier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 18:52:01 by rwallier          #+#    #+#             */
-/*   Updated: 2023/06/26 18:07:40 by wcaetano         ###   ########.fr       */
+/*   Updated: 2023/06/26 18:11:08 by rwallier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -554,7 +554,6 @@ int	cd_builtin(t_word *node)
 
 int	cd_with_params(t_word *node)
 {
-	write(1, "with params\n", 13);
 	char	*pwd;
 
 	if (node && node->next && node->next->flag == MS_WORD
@@ -582,7 +581,6 @@ int	cd_with_params(t_word *node)
 
 int	cd_without_params(t_word *node)
 {
-	write(1, "without params\n", 16);
 	char	*pwd;
 
 	pwd = getcwd(NULL, 0);
