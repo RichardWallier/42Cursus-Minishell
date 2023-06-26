@@ -6,7 +6,7 @@
 /*   By: wcaetano <wcaetano@student.42.rio>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 18:52:01 by rwallier          #+#    #+#             */
-/*   Updated: 2023/06/26 18:33:50 by wcaetano         ###   ########.fr       */
+/*   Updated: 2023/06/26 18:36:06 by wcaetano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -1454,6 +1454,7 @@ t_word	*parse_prompt(char *line, t_list *env_lst)
 	{
 		word_len = get_word_len(line);
 		new_word = ms_lstnew(ft_substr(line, 0, word_len));
+		printf("%s\n", ft_substr(line, 0, word_len));
 		new_word->env_lst = env_lst;
 		ms_lstadd_back(&word_lst, new_word);
 		line += word_len;
