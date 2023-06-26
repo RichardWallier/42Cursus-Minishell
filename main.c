@@ -6,7 +6,7 @@
 /*   By: wcaetano <wcaetano@student.42.rio>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 18:52:01 by rwallier          #+#    #+#             */
-/*   Updated: 2023/06/26 18:13:57 by wcaetano         ###   ########.fr       */
+/*   Updated: 2023/06/26 18:32:40 by wcaetano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -555,6 +555,8 @@ int	cd_with_params(t_word *node)
 		&& node->next->next && node->next->next->flag == MS_WORD)
 		return (ft_putstr_fd("Ms: cd: too many arguments\n", STDERR_FILENO), 1);
 	pwd = getcwd(NULL, 0);
+	if (node->next->word[0] ==  '~')
+		node->next->word = ft_strjoin(ft_strdup(get_environment_node(node->env_lst, "HOME"), 0), node->next->word + 1, 2);
 	if (chdir(node->next->word) == -1)
 	{
 		ft_putstr_fd("Ms: cd: no such file or dir\n", STDERR_FILENO);
@@ -1452,6 +1454,7 @@ t_word	*parse_prompt(char *line, t_list *env_lst)
 	{
 		word_len = get_word_len(line);
 		new_word = ms_lstnew(ft_substr(line, 0, word_len));
+		printf("%s\n", ft_substr(line, 0, word_len));
 		new_word->env_lst = env_lst;
 		ms_lstadd_back(&word_lst, new_word);
 		line += word_len;
