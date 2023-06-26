@@ -6,7 +6,7 @@
 /*   By: rwallier <rwallier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 18:52:01 by rwallier          #+#    #+#             */
-/*   Updated: 2023/06/25 17:52:14 by rwallier         ###   ########.fr       */
+/*   Updated: 2023/06/26 17:46:03 by rwallier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,7 @@ int	main(void)
 
 	data.pwd = getcwd(NULL, 0);
 	parse_environment(&data, environ);
-
+	ms_set_sighandle();
 	while (42)
 	{
 		data.bash = ft_strjoin(data.pwd, "$ ", 0);
@@ -74,6 +74,36 @@ int	main(void)
 		ms_lstclear(&data.prompt, 1);
 	}
 	return (0);
+}
+
+void	ms_set_sighandle(void)
+{
+	struct sigaction	sig;
+
+	signal(SIGQUIT, SIG_IGN);
+	sig.sa_handler = ms_sigint_handle;
+	sigemptyset(&sig.sa_mask);
+	sigaddset(&sig.sa_mask, SIGINT);
+	sig.sa_flags = 0;
+	sigaction(SIGINT, &sig, NULL);
+	return ;
+}
+
+void	ms_sigint_handle(int signal)
+{
+	extern unsigned int	g_exit_status;
+
+	if (signal == SIGINT)
+	{
+		if (RL_ISSTATE(RL_STATE_READCMD))
+			ioctl(STDIN_FILENO, TIOCSTI, "\n");
+		else
+			write(STDOUT_FILENO, "\n", 1);
+		rl_replace_line("", 1);
+		rl_on_new_line();
+		g_exit_status = 1;
+	}
+	return ;
 }
 
 int	parse_environment(t_data *data, char **environ)
@@ -183,7 +213,6 @@ void	exec_pipe(t_word *node, t_list **env_lst)
 	uint16_t	builtin;
 
 	builtin = is_builtin(node);
-	printf("FORK FORK FORK FORK\n");
 	node->pid = fork();
 	if (node->pid != 0)
 		return ;
@@ -527,7 +556,6 @@ int	cd_with_params(t_word *node)
 		&& node->next->next && node->next->next->flag == MS_WORD)
 		return (ft_putstr_fd("Ms: cd: too many arguments\n", STDERR_FILENO), 1);
 	pwd = getcwd(NULL, 0);
-	printf("WORD: -%s-\n", node->next->word);
 	if (chdir(node->next->word) == -1)
 	{
 		ft_putstr_fd("Ms: cd: no such file or dir\n", STDERR_FILENO);

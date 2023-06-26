@@ -6,7 +6,7 @@
 /*   By: rwallier <rwallier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 18:52:16 by rwallier          #+#    #+#             */
-/*   Updated: 2023/06/25 16:59:47 by rwallier         ###   ########.fr       */
+/*   Updated: 2023/06/26 17:44:20 by rwallier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,6 +83,10 @@ enum e_builtins
 	MS_ENV = 8192,
 	MS_EXIT = 16384,
 };
+
+void	ms_set_sighandle(void);
+
+void	ms_sigint_handle(int signal);
 
 int		exit_error_code(t_word **lst);
 
