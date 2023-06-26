@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: wcaetano <wcaetano@student.42.rio>         +#+  +:+       +#+        */
+/*   By: rwallier <rwallier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 18:52:01 by rwallier          #+#    #+#             */
-/*   Updated: 2023/06/26 18:36:06 by wcaetano         ###   ########.fr       */
+/*   Updated: 2023/06/26 18:37:41 by rwallier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -532,7 +532,6 @@ int	echo_builtin(t_word *node)
 
 int	cd_builtin(t_word *node)
 {
-	write(1, "cd builtin no pipe\n", 20);
 	uint8_t	err;
 
 	if (node->next && node->next->next && node->next->next->flag != MS_WORD)
@@ -1454,7 +1453,6 @@ t_word	*parse_prompt(char *line, t_list *env_lst)
 	{
 		word_len = get_word_len(line);
 		new_word = ms_lstnew(ft_substr(line, 0, word_len));
-		printf("%s\n", ft_substr(line, 0, word_len));
 		new_word->env_lst = env_lst;
 		ms_lstadd_back(&word_lst, new_word);
 		line += word_len;
