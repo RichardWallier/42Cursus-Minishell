@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rwallier <rwallier@student.42.fr>          +#+  +:+       +#+        */
+/*   By: wcaetano <wcaetano@student.42.rio>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 18:52:01 by rwallier          #+#    #+#             */
-/*   Updated: 2023/06/26 17:46:03 by rwallier         ###   ########.fr       */
+/*   Updated: 2023/06/26 18:07:40 by wcaetano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,11 +52,11 @@ int	main(void)
 	char		*line;
 	extern char	**environ;
 
-	data.pwd = getcwd(NULL, 0);
 	parse_environment(&data, environ);
 	ms_set_sighandle();
 	while (42)
 	{
+		data.pwd = get_environment_node(data.environ, "PWD");
 		data.bash = ft_strjoin(data.pwd, "$ ", 0);
 		line = readline(data.bash);
 		free(data.bash);
@@ -74,6 +74,11 @@ int	main(void)
 		ms_lstclear(&data.prompt, 1);
 	}
 	return (0);
+}
+
+void update_prompt(t_data *data)
+{
+
 }
 
 void	ms_set_sighandle(void)
