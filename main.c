@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rwallier <rwallier@student.42.fr>          +#+  +:+       +#+        */
+/*   By: wcaetano <wcaetano@student.42.rio>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 18:52:01 by rwallier          #+#    #+#             */
-/*   Updated: 2023/06/26 18:37:41 by rwallier         ###   ########.fr       */
+/*   Updated: 2023/06/26 18:40:08 by wcaetano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,7 @@ int	main(void)
 	extern char	**environ;
 
 	parse_environment(&data, environ);
-	ms_set_sighandle();
+	set_sighandle();
 	while (42)
 	{
 		data.pwd = get_environment_node(data.environ, "PWD");
@@ -76,12 +76,12 @@ int	main(void)
 	return (0);
 }
 
-void	ms_set_sighandle(void)
+void	set_sighandle(void)
 {
 	struct sigaction	sig;
 
 	signal(SIGQUIT, SIG_IGN);
-	sig.sa_handler = ms_sigint_handle;
+	sig.sa_handler = sigint_handle;
 	sigemptyset(&sig.sa_mask);
 	sigaddset(&sig.sa_mask, SIGINT);
 	sig.sa_flags = 0;
@@ -89,7 +89,7 @@ void	ms_set_sighandle(void)
 	return ;
 }
 
-void	ms_sigint_handle(int signal)
+void	sigint_handle(int signal)
 {
 	extern unsigned int	g_exit_status;
 
