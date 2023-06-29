@@ -6,11 +6,35 @@
 #    By: rwallier <rwallier@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/02/12 18:52:08 by rwallier          #+#    #+#              #
-#    Updated: 2023/06/25 17:14:35 by rwallier         ###   ########.fr        #
+#    Updated: 2023/06/29 09:53:03 by rwallier         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 SOURCE	=	main.c
+
+SOURCE	+=	sighandle/set_sighandle.c
+
+SOURCE	+=	utils/str_utils.c utils/general_utils.c
+
+SOURCE	+=	parser/parser.c parser/parser_utils.c
+
+SOURCE	+=	linked_list/lst_add_back.c linked_list/lst_clear.c
+SOURCE	+=	linked_list/lst_new.c linked_list/lst_remove_empty_word.c
+SOURCE	+=	linked_list/lst_remove_if.c linked_list/set_head.c
+
+SOURCE	+=	lexer/lexer.c lexer/lexer_utils.c
+SOURCE	+=	lexer/lexer_utils2.c lexer/lexer_utils3.c
+SOURCE	+=	lexer/lexer_utils4.c
+
+SOURCE	+=	executor/executor.c executor/executor_utils.c
+SOURCE	+=	executor/executor_utils2.c executor/executor_utils3.c
+
+SOURCE	+=	builtin/builtin.c builtin/cd.c 
+SOURCE	+=	builtin/echo.c builtin/env.c 
+SOURCE	+=	builtin/export.c builtin/pwd.c
+SOURCE	+=	builtin/unset.c 
+
+SOURCE	+=	wait/wait_cmd.c
 
 OBJECTS	=	$(SOURCE:.c=.o)
 
