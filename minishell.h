@@ -6,7 +6,7 @@
 /*   By: rwallier <rwallier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 18:52:16 by rwallier          #+#    #+#             */
-/*   Updated: 2023/06/29 09:50:04 by rwallier         ###   ########.fr       */
+/*   Updated: 2023/06/29 10:45:48 by rwallier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,6 @@
 # include <readline/history.h>
 # include "./libft/libft.h"
 
-
 typedef struct s_word
 {
 	char			*word;
@@ -51,7 +50,7 @@ typedef struct s_data {
 }				t_data;
 
 typedef struct s_linked_list {
-	void*					content;
+	void					*content;
 	int						flag;
 	struct s_linked_list	*next;
 }				t_linked_list;
@@ -131,14 +130,15 @@ int		get_environment_len_after_expand(char *line, t_list *env);
 char	*remove_quotes(char *line, int flag);
 void	set_quote_with_null(char *line);
 int		get_expand_environment_len(char *line, t_list *env);
-void	expand_environment_utils_check_line(char *line, char *ret_line, t_pos *aux, t_list *env);
+void	expand_environment_utils_check_line(char *line, char *ret_line,
+			t_pos *aux, t_list *env);
 int		get_environment_name_len(char *line);
 int		valid_environment_name(char *line);
 int		check_bin_path(char **cmd, t_list *env);
 
 //executor
-int	open_pipe(t_word *node);
-int	executor(t_word **lst, t_list **env_lst, int flag);
+int		open_pipe(t_word *node);
+int		executor(t_word **lst, t_list **env_lst, int flag);
 t_word	*clean_sentence_redirections(t_word **lst, int flag);
 void	close_sentence_fd(t_word *node);
 t_word	*get_next_command(t_word *node);
@@ -168,13 +168,13 @@ void	exit_builtin(t_word **word, t_list **env_lst);
 void	exec_builtin(t_word *node, t_list **env_lst, uint16_t builtin);
 
 //builtins functions
-int	cd_builtin(t_word *node);
-int	env_builtiin(t_word *node);
-int	unset_builtin(t_word *node, t_list **env);
-int	pwd_builtin(t_word *node);
-int	export_builtin(t_word *node);
-int	echo_builtin(t_word *node);
-int	env_builtiin(t_word *node);
+int		cd_builtin(t_word *node);
+int		env_builtiin(t_word *node);
+int		unset_builtin(t_word *node, t_list **env);
+int		pwd_builtin(t_word *node);
+int		export_builtin(t_word *node);
+int		echo_builtin(t_word *node);
+int		env_builtiin(t_word *node);
 
 // Ms lst functions
 void	ms_lstclear(t_word **lst, int flag);
@@ -183,6 +183,5 @@ void	lst_remove_empty_word(t_word **head);
 t_word	*ms_lstnew(void *word);
 void	ms_lst_remove_if(t_word **head);
 void	set_head(t_word *head);
-
 
 #endif // !MINISHELL_H

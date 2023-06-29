@@ -6,7 +6,7 @@
 /*   By: rwallier <rwallier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/28 13:04:58 by rwallier          #+#    #+#             */
-/*   Updated: 2023/06/28 21:16:39 by rwallier         ###   ########.fr       */
+/*   Updated: 2023/06/29 10:22:32 by rwallier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ int	get_flag_word(char *word, int last_flag)
 		return (MS_REDIRECT_IN);
 	else if (ft_strncmp(word, ">", 2) == 0)
 		return (MS_REDIRECT_OUT);
-	else if (last_flag == MS_REDIRECT_OUT  || last_flag == MS_REDIRECT_IN
+	else if (last_flag == MS_REDIRECT_OUT || last_flag == MS_REDIRECT_IN
 		|| last_flag == MS_HEREDOC || last_flag == MS_APPEND)
 		return (MS_REDIRECT_FILE);
 	return (MS_WORD);

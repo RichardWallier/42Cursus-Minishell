@@ -6,13 +6,14 @@
 /*   By: rwallier <rwallier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/28 21:26:13 by rwallier          #+#    #+#             */
-/*   Updated: 2023/06/28 22:11:16 by rwallier         ###   ########.fr       */
+/*   Updated: 2023/06/29 10:23:58 by rwallier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-void	expand_environment_utils_check_line(char *line, char *ret_line, t_pos *aux, t_list *env)
+void	expand_environment_utils_check_line(char *line,
+		char *ret_line, t_pos *aux, t_list *env)
 {
 	char					*env_value;
 	int						env_len;
@@ -32,7 +33,8 @@ void	expand_environment_utils_check_line(char *line, char *ret_line, t_pos *aux,
 		env_value = ft_substr(&line[aux->i], 1,
 				get_environment_name_len(&line[aux->i]));
 		env_len = ft_strlen(get_environment_node(env, env_value));
-		ft_memcpy(&ret_line[aux->j], get_environment_node(env, env_value), env_len);
+		ft_memcpy(&ret_line[aux->j],
+			get_environment_node(env, env_value), env_len);
 	}
 	aux->i += get_environment_name_len(&line[aux->i]) + 1;
 	aux->j += env_len;
@@ -40,7 +42,7 @@ void	expand_environment_utils_check_line(char *line, char *ret_line, t_pos *aux,
 	return ;
 }
 
-int get_environment_name_len(char *line)
+int	get_environment_name_len(char *line)
 {
 	int	word_len;
 

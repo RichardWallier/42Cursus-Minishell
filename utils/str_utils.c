@@ -6,7 +6,7 @@
 /*   By: rwallier <rwallier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/28 12:45:59 by rwallier          #+#    #+#             */
-/*   Updated: 2023/06/29 01:32:26 by rwallier         ###   ########.fr       */
+/*   Updated: 2023/06/29 10:37:48 by rwallier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,11 +79,11 @@ int	check_quote(char *line)
 
 int	is_meta_char(char *c)
 {
-    if ((c[0] == '<' && c[1] == '<') || (c[0] == '>' && c[1] == '>'))
-        return (2);
-    else if (*c == '|' || *c == '>' || *c == '<')
-        return (1);
-    return (0);
+	if ((c[0] == '<' && c[1] == '<') || (c[0] == '>' && c[1] == '>'))
+		return (2);
+	else if (*c == '|' || *c == '>' || *c == '<')
+		return (1);
+	return (0);
 }
 
 int	str_is_num(char *str)

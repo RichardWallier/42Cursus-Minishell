@@ -6,7 +6,7 @@
 /*   By: rwallier <rwallier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/28 21:27:45 by rwallier          #+#    #+#             */
-/*   Updated: 2023/06/29 01:33:44 by rwallier         ###   ########.fr       */
+/*   Updated: 2023/06/29 10:36:40 by rwallier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,14 +68,15 @@ char	**node_to_matrix(t_word *node)
 
 int	parse_environment(t_data *data, char **environ)
 {
-	int	index;
+	int		index;
 	t_list	*temp;
 
 	data->environ = ft_lstnew(ft_substr(environ[0], 0, ft_strlen(environ[0])));
 	index = 1;
 	while (environ[index])
 	{
-		temp = ft_lstnew(ft_substr(environ[index], 0, ft_strlen(environ[index])));
+		temp = ft_lstnew(ft_substr(environ[index], 0,
+					ft_strlen(environ[index])));
 		ft_lstadd_back(&data->environ, temp);
 		index++;
 	}
