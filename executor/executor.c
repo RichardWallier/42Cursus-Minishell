@@ -6,7 +6,7 @@
 /*   By: rwallier <rwallier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/28 21:35:07 by rwallier          #+#    #+#             */
-/*   Updated: 2023/06/29 09:51:31 by rwallier         ###   ########.fr       */
+/*   Updated: 2023/07/01 16:20:17 by wcaetano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ int	executor(t_word **lst, t_list **env_lst, int flag)
 		else
 			node = clean_sentence_redirections(aux, 0);
 		if (has_pipe(*lst))
-			exec_pipe(node, env_lst); 
+			exec_pipe(node, env_lst);
 		else
 			exec_no_pipe(node, env_lst);
 		close_sentence_fd(node);

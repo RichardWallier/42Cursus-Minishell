@@ -6,7 +6,7 @@
 /*   By: rwallier <rwallier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/28 12:55:51 by rwallier          #+#    #+#             */
-/*   Updated: 2023/06/29 11:00:34 by rwallier         ###   ########.fr       */
+/*   Updated: 2023/07/01 16:21:10 by wcaetano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ int	main(void)
 			exit_builtin(&data.prompt, &data.environ);
 		if (line[0])
 			add_history(line);
-		if (parser(line, &data)) 
+		if (parser(line, &data))
 		{
 			ms_lstclear(&data.prompt, 1);
 			continue ;
