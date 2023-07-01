@@ -45,21 +45,21 @@ CFLAGS	=	-g -Wall -Werror -Wextra
 RM	=	rm -f
 
 $(NAME):	$(OBJECTS)
-		$(AR_RC) $(NAME) $(OBJECTS)
+	@$(AR_RC) $(NAME) $(OBJECTS)
 
 .c.o:	
-	$(CC) $(CFLAGS) -c -I . $< -o $(<:.c=.o)
+	@$(CC) $(CFLAGS) -c -I . $< -o $(<:.c=.o)
 
 all:	$(NAME)
 
 bonus:	$(BONUS_OBJECTS)
-	$(AR_RC) $(NAME) $(BONUS_OBJECTS)
+	@$(AR_RC) $(NAME) $(BONUS_OBJECTS)
 
 clean:
-		$(RM) $(OBJECTS) $(BONUS_OBJECTS)
+		@$(RM) $(OBJECTS) $(BONUS_OBJECTS)
 
 fclean:	clean
-		$(RM) $(NAME)
+		@$(RM) $(NAME)
 
 re:	fclean all
 

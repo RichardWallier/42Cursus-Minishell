@@ -78,9 +78,7 @@ char	*check_bin(char *cmd, t_list *env)
 		if (access(cmd, F_OK | X_OK) == 0)
 			return (ft_strdup(cmd, 0));
 		else
-		{
 			return (ft_putstr_fd("Ms: cmd not found\n", STDERR_FILENO), NULL);
-		}
 	}
 	cmd = ft_strjoin("/", cmd, 0);
 	if (check_bin_current_dir(&cmd) == 0)
@@ -107,8 +105,9 @@ int	check_bin_current_dir(char **cmd)
 		}
 		else
 		{
-			ft_putstr_fd("Ms: cmd access dennied\n", STDERR_FILENO);
+			ft_putstr_fd("Ms: cmd access denied\n", STDERR_FILENO);
 			g_exit_status = 126;
+			return (0);
 		}
 	}
 	free(cmd_with_pwd);

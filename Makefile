@@ -6,7 +6,7 @@
 #    By: rwallier <rwallier@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/02/12 18:52:08 by rwallier          #+#    #+#              #
-#    Updated: 2023/06/29 10:14:59 by rwallier         ###   ########.fr        #
+#    Updated: 2023/07/01 16:40:43 by wcaetano         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -47,11 +47,11 @@ MAKE	=	make -C
 
 NAME	=	minishell
 
-CFLAGS	= -g -L/opt/homebrew/opt/readline/lib -I/opt/homebrew/opt/readline/include
+CFLAGS	= -g #-L/opt/homebrew/opt/readline/lib -I/opt/homebrew/opt/readline/include
 
 LIBFILES	=	-lreadline
 
-CC	=	gcc
+CC	=	cc
 
 RM	=	rm -f
 
